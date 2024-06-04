@@ -30,14 +30,20 @@ public class AmadeusApiKeyService {
 
         String body = "grant_type=client_credentials&client_id=" + amadeusApiKey + "&client_secret=" + amadeusSecretKey;
 
+        System.out.println(body);
         HttpEntity<String> request = new HttpEntity<>(body, headers);
 
+        System.out.println(request);
         try {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, request, String.class);
+
+            System.out.println(response);
+
             if (response.getStatusCode() == HttpStatus.OK) {
                 String responseBody = response.getBody();
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode root = mapper.readTree(responseBody);
+
                 return root.path("access_token").asText();
             } else {
                 System.err.println("Failed to get access token, status code: " + response.getStatusCode());

@@ -1,6 +1,5 @@
 package com.example.travelappbackend.service;
 
-import com.example.travelappbackend.entity.User;
 import com.example.travelappbackend.model.UserDTO;
 import com.example.travelappbackend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,7 @@ public class UserService {
 
     public boolean existsByMemberId(String userId){
 
-        return userRepository.existsUserId(userId);
+        return userRepository.existsByUserId(userId);
     }
 
 }
