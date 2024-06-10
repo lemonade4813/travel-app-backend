@@ -55,7 +55,6 @@
 
 package com.example.travelappbackend.service;
 
-
 import com.example.travelappbackend.entity.FlightData;
 import com.example.travelappbackend.repository.FlightDataRepository;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -65,9 +64,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-
-import javax.swing.text.Style;
-import java.util.Iterator;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 public class AmadeusFlightService {
@@ -88,13 +85,22 @@ public class AmadeusFlightService {
             String token = getAccessToken();
             if (token == null) throw new RuntimeException("Failed to get access token");
 
-            parseAndSaveData(makeApiCall(url, token));
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
+            String originLocationCode = builder.build().getQueryParams().getFirst("originLocationCode");
+            String destinationLocationCode = builder.build().getQueryParams().getFirst("destinationLocationCode");
+
+            JsonNode response = makeApiCall(url, token);
+            parseAndSaveData(response, originLocationCode, destinationLocationCode);
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
                 String newToken = amadeusApiKeyService.getAmadeusAccessToken();
                 if (newToken == null) throw new RuntimeException("Failed to refresh access token");
 
-                parseAndSaveData(makeApiCall(url, newToken));
+                JsonNode response = makeApiCall(url, newToken);
+                UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
+                String originLocationCode = builder.build().getQueryParams().getFirst("originLocationCode");
+                String destinationLocationCode = builder.build().getQueryParams().getFirst("destinationLocationCode");
+                parseAndSaveData(response, originLocationCode, destinationLocationCode);
             } else {
                 throw e;
             }
@@ -114,7 +120,6 @@ public class AmadeusFlightService {
 
 //        System.out.println("response : " + response);
 
-
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.readTree(response.getBody());
@@ -123,7 +128,7 @@ public class AmadeusFlightService {
         }
     }
 
-    private void parseAndSaveData(JsonNode response) {
+    private void parseAndSaveData(JsonNode response, String originLocationCode, String destinationLocationCode) {
         JsonNode data = response.path("data");
 
         System.out.println("datalist : " + data);
@@ -131,8 +136,14 @@ public class AmadeusFlightService {
             for (JsonNode flight : data) {
                 FlightData flightData = new FlightData();
                 flightData.setType(flight.path("type").asText());
+                flightData.setOfferId(flight.path("offerId").asInt());
+                flightData.setCurrency(flight.path("price").path("currency").asText());
+                flightData.setTotal(flight.path("price").path("total").asText());
+                flightData.setBase(flight.path("price").path("base").asText());
                 flightData.setOneWay(flight.path("oneWay").asBoolean());
                 flightData.setLastTicketingDate(flight.path("lastTicketingDate").asText());
+                flightData.setOriginLocationCode(originLocationCode);
+                flightData.setDestinationLocationCode(destinationLocationCode);
 
                 flightDataRepository.save(flightData);
             }

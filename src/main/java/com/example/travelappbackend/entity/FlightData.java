@@ -19,6 +19,12 @@ public class FlightData {
     private String type;
     private boolean oneWay;
     private String lastTicketingDate;
+    private String originLocationCode;
+    private String destinationLocationCode;
+    private Integer offerId;
+    private String currency;
+    private String total;
+    private String base;
 
 
 }
