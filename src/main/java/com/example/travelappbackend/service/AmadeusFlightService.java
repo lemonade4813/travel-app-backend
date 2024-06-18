@@ -136,7 +136,7 @@ public class AmadeusFlightService {
             for (JsonNode flight : data) {
                 FlightData flightData = new FlightData();
                 flightData.setType(flight.path("type").asText());
-                flightData.setOfferId(flight.path("offerId").asInt());
+                flightData.setOfferId(flight.path("id").asInt());
                 flightData.setCurrency(flight.path("price").path("currency").asText());
                 flightData.setTotal(flight.path("price").path("total").asText());
                 flightData.setBase(flight.path("price").path("base").asText());
