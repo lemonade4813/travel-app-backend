@@ -13,7 +13,6 @@ import lombok.Setter;
 public class FlightData {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
 
     private String type;

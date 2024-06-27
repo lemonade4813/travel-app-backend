@@ -3,6 +3,7 @@ package com.example.travelappbackend.service;
 import com.example.travelappbackend.model.UserDTO;
 import com.example.travelappbackend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
 
