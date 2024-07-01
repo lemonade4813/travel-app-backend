@@ -1,27 +1,18 @@
 package com.example.travelappbackend;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.context.annotation.ComponentScan;
 
 
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class}, scanBasePackages = {"com.example.travelappbackend.repository"})
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class},
+                       scanBasePackages = {"com.example.travelappbackend.repository"})
 public class TravelAppBackendApplication {
 
     public static void main(String[] args) {
+        Dotenv dotenv = Dotenv.load();
+        System.setProperty("MONGO_DB_URI", dotenv.get("MONGO_DB_URI"));
         SpringApplication.run(TravelAppBackendApplication.class, args);
     }
-
-//    @Bean
-//    public WebMvcConfigurer corsConfigurer(){
-//        return new WebMvcConfigurer() {
-//            @Override
-//            public void addCorsMappings(CorsRegistry registry) {
-//                registry.addMapping("/**").allowedOrigins("*");
-//
-//            }
-//        };
-//    }
-
 }
