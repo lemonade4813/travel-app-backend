@@ -1,14 +1,14 @@
 package com.example.travelappbackend.entity;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Setter
-@Entity(name = "flight_data")
-public class FlightData {
+@Document(collection = "flight_info")
+public class FlightInfo {
 
     @Id
     private Long Id;

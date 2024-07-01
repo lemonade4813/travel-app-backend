@@ -1,7 +1,7 @@
 package com.example.travelappbackend.service;
 
-import com.example.travelappbackend.entity.FlightData;
-import com.example.travelappbackend.repository.FlightDataRepository;
+import com.example.travelappbackend.entity.FlightInfo;
+import com.example.travelappbackend.repository.FlightInfoRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +16,13 @@ public class AmadeusFlightService {
 
     private final RestTemplate restTemplate;
     private final AmadeusApiKeyService amadeusApiKeyService;
-    private final FlightDataRepository flightDataRepository;
+    private final FlightInfoRepository flightInfoRepository;
 
     @Autowired
-    public AmadeusFlightService(RestTemplate restTemplate, AmadeusApiKeyService amadeusApiKeyService, FlightDataRepository flightDataRepository) {
+    public AmadeusFlightService(RestTemplate restTemplate, AmadeusApiKeyService amadeusApiKeyService, FlightInfoRepository flightInfoRepository) {
         this.restTemplate = restTemplate;
         this.amadeusApiKeyService = amadeusApiKeyService;
-        this.flightDataRepository = flightDataRepository;
+        this.flightInfoRepository = flightInfoRepository;
     }
 
     public void fetchData(String url) {
@@ -78,19 +78,19 @@ public class AmadeusFlightService {
 
         System.out.println("datalist : " + data);
         if (data.isArray()) {
-            for (JsonNode flight : data) {
-                FlightData flightData = new FlightData();
-                flightData.setType(flight.path("type").asText());
-                flightData.setOfferId(flight.path("id").asInt());
-                flightData.setCurrency(flight.path("price").path("currency").asText());
-                flightData.setTotal(flight.path("price").path("total").asText());
-                flightData.setBase(flight.path("price").path("base").asText());
-                flightData.setOneWay(flight.path("oneWay").asBoolean());
-                flightData.setLastTicketingDate(flight.path("lastTicketingDate").asText());
-                flightData.setOriginLocationCode(originLocationCode);
-                flightData.setDestinationLocationCode(destinationLocationCode);
+            for (JsonNode flightData : data) {
+                FlightInfo flightInfo = new FlightInfo();
+                flightInfo.setType(flightData.path("type").asText());
+                flightInfo.setOfferId(flightData.path("id").asInt());
+                flightInfo.setCurrency(flightData.path("price").path("currency").asText());
+                flightInfo.setTotal(flightData.path("price").path("total").asText());
+                flightInfo.setBase(flightData.path("price").path("base").asText());
+                flightInfo.setOneWay(flightData.path("oneWay").asBoolean());
+                flightInfo.setLastTicketingDate(flightData.path("lastTicketingDate").asText());
+                flightInfo.setOriginLocationCode(originLocationCode);
+                flightInfo.setDestinationLocationCode(destinationLocationCode);
 
-                flightDataRepository.save(flightData);
+                flightInfoRepository.save(flightInfo);
             }
         }
     }

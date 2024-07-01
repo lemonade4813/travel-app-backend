@@ -43,7 +43,6 @@ public class StartupService {
 
     @PostConstruct
     public void init() {
-//        String[] locationCodes = {"ICN","SYD","JFK","LAX","TPE","BKK","NRT","HAN"};
 
         String[] locationCodes = {"ICN","SYD","JFK"};
 

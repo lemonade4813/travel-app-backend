@@ -1,6 +1,8 @@
 package com.example.travelappbackend.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -8,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
+@Configuration
 public class AmadeusApiKeyService {
 
     @Value("${amadeus.api.key}")
@@ -18,6 +21,7 @@ public class AmadeusApiKeyService {
 
     private final RestTemplate restTemplate;
 
+    @Autowired
     public AmadeusApiKeyService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
@@ -29,14 +33,13 @@ public class AmadeusApiKeyService {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         String body = "grant_type=client_credentials&client_id=" + amadeusApiKey + "&client_secret=" + amadeusSecretKey;
-
         System.out.println(body);
         HttpEntity<String> request = new HttpEntity<>(body, headers);
 
         System.out.println(request);
         try {
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, request, String.class);
 
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, request, String.class);
             System.out.println(response);
 
             if (response.getStatusCode() == HttpStatus.OK) {

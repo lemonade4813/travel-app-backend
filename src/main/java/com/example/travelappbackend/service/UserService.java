@@ -3,15 +3,21 @@ package com.example.travelappbackend.service;
 import com.example.travelappbackend.model.UserDTO;
 import com.example.travelappbackend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 @Service
 public class UserService {
 
+    private final UserRepository userRepository;
+
     @Autowired
-    private UserRepository userRepository;
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
 
     public void addUser(UserDTO userDTO){
          userRepository.save(userDTO.toEntity());

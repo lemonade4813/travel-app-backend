@@ -6,8 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 
 
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class},
-                       scanBasePackages = {"com.example.travelappbackend.repository"})
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 public class TravelAppBackendApplication {
 
     public static void main(String[] args) {

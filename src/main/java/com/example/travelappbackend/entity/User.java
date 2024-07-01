@@ -2,6 +2,7 @@ package com.example.travelappbackend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Setter
@@ -10,7 +11,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name="user_info")
+@Document(collection="user_info")
 
 public class User {
 
