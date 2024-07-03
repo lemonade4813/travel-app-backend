@@ -1,32 +1,8 @@
-//package com.example.travelappbackend.service;
-//
-//import jakarta.annotation.PostConstruct;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Service;
-//
-//@Service
-//public class StartupService {
-//
-//    private final AmadeusFlightService amadeusFlightService;
-//
-//    @Autowired
-//    public StartupService(AmadeusFlightService amadeusFlightService) {
-//        this.amadeusFlightService = amadeusFlightService;
-//    }
-//
-//    @PostConstruct
-//    public void init() {
-//        String url = "https://test.api.amadeus.com/v2/shopping/flight-offers?originLocationCode=SYD&destinationLocationCode=BKK&departureDate=2024-06-10&adults=1&nonStop=false&max=250";
-//
-//        System.out.println("함수 실행");
-//        amadeusFlightService.fetchData(url);
-//    }
-//}
-
 package com.example.travelappbackend.service;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -43,8 +19,12 @@ public class StartupService {
 
     @PostConstruct
     public void init() {
+        runScheduledTask(); // 시작시 한 번 실행
+    }
 
-        String[] locationCodes = {"ICN","SYD","JFK"};
+    @Scheduled(cron = "0 0 12 * * ?") // 매일 오후 12시에 실행
+    public void runScheduledTask() {
+        String[] locationCodes = {"ICN", "SYD", "JFK"};
 
         // 현재 날짜 기준으로 2일 뒤의 날짜 계산
         LocalDate today = LocalDate.now();
