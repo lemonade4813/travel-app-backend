@@ -1,17 +1,26 @@
 package com.example.travelappbackend.service;
 
+import com.example.travelappbackend.entity.FlightCollectionLogs;
 import com.example.travelappbackend.entity.FlightDetailInfo;
 import com.example.travelappbackend.entity.FlightInfo;
+import com.example.travelappbackend.entity.Segment;
+import com.example.travelappbackend.repository.FlightCollectionLogsRepository;
 import com.example.travelappbackend.repository.FlightDetailInfoRepository;
 import com.example.travelappbackend.repository.FlightInfoRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class AmadeusFlightService {
@@ -20,16 +29,19 @@ public class AmadeusFlightService {
     private final AmadeusApiKeyService amadeusApiKeyService;
     private final FlightInfoRepository flightInfoRepository;
     private final FlightDetailInfoRepository flightDetailInfoRepository;
+    private final FlightCollectionLogsRepository flightCollectionLogsRepository;
 
     @Autowired
     public AmadeusFlightService(RestTemplate restTemplate,
                                 AmadeusApiKeyService amadeusApiKeyService,
                                 FlightInfoRepository flightInfoRepository,
-                                FlightDetailInfoRepository flightDetailInfoRepository) {
+                                FlightDetailInfoRepository flightDetailInfoRepository,
+                                FlightCollectionLogsRepository flightCollectionLogsRepository) {
         this.restTemplate = restTemplate;
         this.amadeusApiKeyService = amadeusApiKeyService;
         this.flightInfoRepository = flightInfoRepository;
         this.flightDetailInfoRepository = flightDetailInfoRepository;
+        this.flightCollectionLogsRepository = flightCollectionLogsRepository;
     }
 
     public void fetchData(String url) {
@@ -78,56 +90,96 @@ public class AmadeusFlightService {
         }
     }
 
-    private void parseAndSaveData(JsonNode response, String originLocationCode, String destinationLocationCode) {
+    @Transactional
+    public void saveFlightInfoAndDetail(FlightInfo flightInfo, FlightDetailInfo flightDetailInfo) {
+        flightInfoRepository.save(flightInfo);
+        flightDetailInfoRepository.save(flightDetailInfo);
+    }
+
+
+    private void parseAndSaveData(JsonNode response,
+                                  String originLocationCode,
+                                  String destinationLocationCode) {
         JsonNode data = response.path("data");
+        boolean success = true;
 
         System.out.println("datalist : " + data);
-        if (data.isArray()) {
-            for (JsonNode flightData : data) {
 
-                String type = flightData.path("type").asText();
-                int offerId = flightData.path("id").asInt();
-                String currency = flightData.path("price").path("currency").asText();
-                String total = flightData.path("price").path("total").asText();
-                String base = flightData.path("price").path("base").asText();
-                boolean oneway = flightData.path("oneWay").asBoolean();
-                String lastTicketingDate = flightData.path("lastTicketingDate").asText();
+        try {
+            if (data.isArray()) {
+                for (JsonNode flightData : data) {
 
-                // 항공편 예약 제공 정보 테이블에 데이터 저장
+                    String type = flightData.path("type").asText();
+                    int offerId = flightData.path("id").asInt();
+                    String currency = flightData.path("price").path("currency").asText();
+                    String total = flightData.path("price").path("total").asText();
+                    String base = flightData.path("price").path("base").asText();
+                    boolean oneway = flightData.path("oneWay").asBoolean();
+                    String lastTicketingDate = flightData.path("lastTicketingDate").asText();
+                    int numberOfBookableSeats = flightData.path("numberOfBookableSeats").asInt();
 
-                FlightInfo flightInfo = new FlightInfo();
-                flightInfo.setType(type);
-                flightInfo.setOfferId(offerId);
-                flightInfo.setCurrency(currency);
-                flightInfo.setTotal(total);
-                flightInfo.setBase(base);
-                flightInfo.setOneWay(oneway);
-                flightInfo.setLastTicketingDate(lastTicketingDate);
-                flightInfo.setOriginLocationCode(originLocationCode);
-                flightInfo.setDestinationLocationCode(destinationLocationCode);
+                    // 항공편 예약 제공 정보 테이블에 데이터 저장
 
-                flightInfoRepository.save(flightInfo);
+                    FlightInfo flightInfo = new FlightInfo();
+                    flightInfo.setType(type);
+                    flightInfo.setOfferId(offerId);
+                    flightInfo.setCurrency(currency);
+                    flightInfo.setTotal(total);
+                    flightInfo.setBase(base);
+                    flightInfo.setOneWay(oneway);
+                    flightInfo.setLastTicketingDate(lastTicketingDate);
+                    flightInfo.setOriginLocationCode(originLocationCode);
+                    flightInfo.setDestinationLocationCode(destinationLocationCode);
+                    flightInfo.setNumberOfBookableSeats(numberOfBookableSeats);
+
+                    // 항공편 예약 제공 상세 정보 테이블에 데이터 저장
+
+                    FlightDetailInfo flightDetailInfo = new FlightDetailInfo();
+
+                    ObjectMapper mapper = new ObjectMapper();
+                    JsonNode segmentsNode = flightData.path("itineraries").path("segments");
 
 
-                // 항공편 예약 제공 상세 정보 테이블에 데이터 저장
+                    List<Segment> segments = new ArrayList<>();
 
-                FlightDetailInfo flightDetailInfo = new FlightDetailInfo();
+                    if (segmentsNode.isArray()) {
+                        for (JsonNode segmentNode : segmentsNode) {
+                            try {
+                                Segment segment = mapper.treeToValue(segmentNode, Segment.class);
+                                segments.add(segment);
+                            } catch (JsonProcessingException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
 
-                flightDetailInfo.setType(type);
-                flightDetailInfo.setOfferId(offerId);
-                flightDetailInfo.setCurrency(currency);
-                flightDetailInfo.setTotal(total);
-                flightDetailInfo.setBase(base);
-                flightDetailInfo.setOneWay(oneway);
-                flightDetailInfo.setLastTicketingDate(lastTicketingDate);
-                flightDetailInfo.setOriginLocationCode(originLocationCode);
-                flightDetailInfo.setDestinationLocationCode(destinationLocationCode);
+                    flightDetailInfo.setType(type);
+                    flightDetailInfo.setOfferId(offerId);
+                    flightDetailInfo.setCurrency(currency);
+                    flightDetailInfo.setTotal(total);
+                    flightDetailInfo.setBase(base);
+                    flightDetailInfo.setOneWay(oneway);
+                    flightDetailInfo.setLastTicketingDate(lastTicketingDate);
+                    flightDetailInfo.setOriginLocationCode(originLocationCode);
+                    flightDetailInfo.setDestinationLocationCode(destinationLocationCode);
+                    flightDetailInfo.setSegments(segments);
 
-                flightDetailInfoRepository.save(flightDetailInfo);
+                    saveFlightInfoAndDetail(flightInfo, flightDetailInfo);
 
+                }
             }
+
+        } catch (Exception e) {
+            success  = false;
+            throw e;
+        } finally {
+            FlightCollectionLogs log = new FlightCollectionLogs();
+            log.setCollectionDate(new Date());
+            log.setSaveSuccess(success);
+            flightCollectionLogsRepository.save(log);
         }
     }
+
 
     private String getAccessToken() {
         return amadeusApiKeyService.getAmadeusAccessToken();

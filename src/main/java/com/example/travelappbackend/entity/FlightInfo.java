@@ -22,6 +22,7 @@ public class FlightInfo {
     private String currency;
     private String total;
     private String base;
+    private Integer numberOfBookableSeats;
 
 
 }
