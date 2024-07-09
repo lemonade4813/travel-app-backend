@@ -13,12 +13,13 @@ public class Hotel {
 
     @Id
     private String id;
+
     private String name;
     private String hotelId;
     private String radius;
     private String radiusUnit;
     private String chainCodes;
-    private String[] amenities;
+//    private String[] amenities;
     private String[] ratings;
 
 }
