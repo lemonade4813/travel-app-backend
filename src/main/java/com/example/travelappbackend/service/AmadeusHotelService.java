@@ -6,6 +6,7 @@ import com.example.travelappbackend.repository.hotel.HotelCollectionLogsReposito
 import com.example.travelappbackend.repository.hotel.HotelInfoRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -13,7 +14,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,15 +27,19 @@ public class AmadeusHotelService {
     private final HotelInfoRepository hotelInfoRepository;
     private final HotelCollectionLogsRepository hotelCollectionLogsRepository;
 
+
     @Autowired
     public AmadeusHotelService(RestTemplate restTemplate,
                                AmadeusApiKeyService amadeusApiKeyService,
                                HotelInfoRepository hotelInfoRepository,
-                               HotelCollectionLogsRepository hotelCollectionLogsRepository) {
+                               HotelCollectionLogsRepository hotelCollectionLogsRepository,
+                               MongoTemplate mongoTemplate
+    ) {
         this.restTemplate = restTemplate;
         this.amadeusApiKeyService = amadeusApiKeyService;
         this.hotelInfoRepository = hotelInfoRepository;
         this.hotelCollectionLogsRepository = hotelCollectionLogsRepository;
+
     }
 
 
@@ -55,21 +62,21 @@ public class AmadeusHotelService {
             if (token == null) throw new RuntimeException("Failed to get access token");
 
             JsonNode response = amadeusApiKeyService.makeApiCall(url, token);
-            parseAndSaveFlightAvailData(response);
+            parseAndSaveHotelAvailData(response);
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
                 String newToken = amadeusApiKeyService.getAmadeusAccessToken();
                 if (newToken == null) throw new RuntimeException("Failed to refresh access token");
 
                 JsonNode response = amadeusApiKeyService.makeApiCall(url, newToken);
-                parseAndSaveFlightAvailData(response);
+                parseAndSaveHotelAvailData(response);
             } else {
                 throw e;
             }
         }
     }
 
-    private void parseAndSaveFlightAvailData(JsonNode response) {
+    private void parseAndSaveHotelAvailData(JsonNode response) {
 
         JsonNode data = response.path("data");
         boolean success = true;
@@ -127,6 +134,41 @@ public class AmadeusHotelService {
             hotelCollectionLogsRepository.save(log);
         }
     }
+
+
+    public void fetchHotelDetailData(String url) {
+
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String date = formatter.format(today);
+
+        try {
+            String token = getAccessToken();
+            if (token == null) throw new RuntimeException("Failed to get access token");
+
+            JsonNode response = amadeusApiKeyService.makeApiCall(url, token);
+            parseAndSaveHotelAvailData(response);
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+                String newToken = amadeusApiKeyService.getAmadeusAccessToken();
+                if (newToken == null) throw new RuntimeException("Failed to refresh access token");
+
+                JsonNode response = amadeusApiKeyService.makeApiCall(url, newToken);
+                parseAndSaveHotelAvailData(response);
+            } else {
+                throw e;
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
 
     private String getAccessToken() {
         return amadeusApiKeyService.getAmadeusAccessToken();

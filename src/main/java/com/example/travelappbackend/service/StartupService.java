@@ -2,21 +2,29 @@ package com.example.travelappbackend.service;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class StartupService {
 
     private final AmadeusFlightService amadeusFlightService;
     private final AmadeusHotelService amadeusHotelService;
+    private final MongoTemplate mongoTemplate;
 
     @Autowired
-    public StartupService(AmadeusFlightService amadeusFlightService, AmadeusHotelService amadeusHotelService) {
+    public StartupService(AmadeusFlightService amadeusFlightService,
+                          AmadeusHotelService amadeusHotelService,
+                          MongoTemplate mongoTemplate
+                          ) {
         this.amadeusFlightService = amadeusFlightService;
         this.amadeusHotelService = amadeusHotelService;
+        this.mongoTemplate = mongoTemplate;
     }
 
     @PostConstruct
@@ -26,6 +34,7 @@ public class StartupService {
 
         runScheduledFlightCollectTask();
         runScheduledHotelListCollectTask();
+        runScheduledHotelDetailInfoCollectTask();
 
     }
 
@@ -61,17 +70,38 @@ public class StartupService {
         String[] cityCodes = {"NYC", "PAR", "TYO", "SEL", "PEK"};
         for(String cityCode : cityCodes) {
             String url = buildHotelListUrl(cityCode);
-            amadeusHotelService.fetchAvailHotelData(url);
+            try {
+                amadeusHotelService.fetchAvailHotelData(url);
+            } catch (Exception e) {
+                // Log the error and continue with the next hotelId
+                System.err.println("Error fetching hotel details for hotelId");
+                e.printStackTrace();
+            }
+
         }
     }
 
-    /*
-        @Scheduled(cron = "0 0 14 * * ?") // 매일 오후 12시에 실행
-        public void runScheduledHotelDetailInfoCollectTask() {
+    @Scheduled(cron = "0 0 14 * * ?") // 매일 오후 12시에 실행
+    public void runScheduledHotelDetailInfoCollectTask() {
+        List<String> hotelIdList = mongoTemplate.getCollection("hotel").
+                distinct("hotelId", String.class).
+                into(new ArrayList<>());
 
+        LocalDate today = LocalDate.now();
+        LocalDate date = today.plusDays(2);
+        String checkInDate = date.toString();
+
+        for(String hotelId : hotelIdList) {
+            String url = buildHotelDetailInfoUrl(hotelId, checkInDate);
+            try {
+                amadeusHotelService.fetchHotelDetailData(url);
+            } catch (Exception e) {
+                // Log the error and continue with the next hotelId
+                System.err.println("Error fetching hotel details for hotelId: " + hotelId);
+                e.printStackTrace();
+            }
         }
-
-    */
+    }
 
 
     private String buildFlightOfferUrl(String origin, String destination, String departureDate, int adults, boolean nonStop, int max) {
@@ -88,12 +118,19 @@ public class StartupService {
         );
     }
 
-//    private String buildHotelDetailInfoUrl(String[] hotelIds, int adults, String checkInDate, int roomQuantity) {
-//        return String.format(
-//                "https://test.api.amadeus.com/v3/shopping/hotel-offers?hotelIds=%d,string&adults=%s&checkInDate=%s&roomQuantity=%d&paymentPolicy=NONE&bestRateOnly=true",
-//                hotelIds, adults, checkInDate, roomQuantity
-//        );
-//    }
-
-
+    private String buildHotelDetailInfoUrl(String hotelId, String checkInDate) {
+        return String.format(
+                "https://test.api.amadeus.com/v3/shopping/hotel-offers?hotelId=%s&checkInDate=%s",
+                hotelId, checkInDate
+        );
+    }
 }
+
+// "https://test.api.amadeus.com/v3/shopping/hotel-offers?hotelId=%adults=%s&checkInDate=%s&roomQuantity=%d&paymentPolicy=NONE&bestRateOnly=true",
+
+//private String buildHotelDetailInfoUrl(String hotelId, int adults, String checkInDate, int roomQuantity) {
+//    return String.format(
+//            "https://test.api.amadeus.com/v3/shopping/hotel-offers?hotelId=%d",
+//            hotelId
+//    );
+//}
