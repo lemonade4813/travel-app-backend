@@ -1,4 +1,4 @@
-package com.example.travelappbackend.entity;
+package com.example.travelappbackend.entity.logs;
 
 import jakarta.persistence.Id;
 import lombok.Getter;
@@ -9,16 +9,11 @@ import java.util.Date;
 
 @Getter
 @Setter
-@Document(collection = "flight_collection_logs")
-
-public class FlightCollectionLogs {
+@Document(collection = "hotel_collection_logs")
+public class HotelCollectionLogs{
 
     @Id
     private String id;
-    private Date collectionDate;
+    private String collectionDate;
     private Boolean saveSuccess;
-
 }
-
-
-

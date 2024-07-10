@@ -1,4 +1,4 @@
-package com.example.travelappbackend.entity;
+package com.example.travelappbackend.entity.hotel;
 
 
 import jakarta.persistence.Id;

@@ -57,4 +57,23 @@ public class AmadeusApiKeyService {
             return null;
         }
     }
+
+    public JsonNode makeApiCall(String url, String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        headers.setOrigin("http://192.168.45.127");
+
+        System.out.println("url" + url);
+        System.out.println("token" + token);
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.readTree(response.getBody());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse response", e);
+        }
+    }
 }

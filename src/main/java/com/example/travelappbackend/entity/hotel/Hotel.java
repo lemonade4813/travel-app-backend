@@ -1,4 +1,4 @@
-package com.example.travelappbackend.entity;
+package com.example.travelappbackend.entity.hotel;
 
 import jakarta.persistence.Id;
 import lombok.Getter;
@@ -16,10 +16,13 @@ public class Hotel {
 
     private String name;
     private String hotelId;
-    private String radius;
-    private String radiusUnit;
-    private String chainCodes;
-//    private String[] amenities;
-    private String[] ratings;
+    private String distance;
+    private String unit;
+
+    private Double latitude;
+    private Double longitude;
+//    private Geocode geocode;
+
+    private String countryCode;
 
 }

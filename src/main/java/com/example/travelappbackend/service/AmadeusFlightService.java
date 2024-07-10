@@ -1,12 +1,13 @@
 package com.example.travelappbackend.service;
 
-import com.example.travelappbackend.entity.FlightCollectionLogs;
-import com.example.travelappbackend.entity.FlightDetailInfo;
-import com.example.travelappbackend.entity.FlightInfo;
-import com.example.travelappbackend.entity.Segment;
-import com.example.travelappbackend.repository.FlightCollectionLogsRepository;
-import com.example.travelappbackend.repository.FlightDetailInfoRepository;
-import com.example.travelappbackend.repository.FlightInfoRepository;
+import com.example.travelappbackend.entity.logs.FlightCollectionLogs;
+import com.example.travelappbackend.entity.flight.FlightDetailInfo;
+import com.example.travelappbackend.entity.flight.FlightInfo;
+import com.example.travelappbackend.entity.flight.Segment;
+import com.example.travelappbackend.entity.logs.HotelCollectionLogs;
+import com.example.travelappbackend.repository.flight.FlightCollectionLogsRepository;
+import com.example.travelappbackend.repository.flight.FlightDetailInfoRepository;
+import com.example.travelappbackend.repository.flight.FlightInfoRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,9 +19,11 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AmadeusFlightService {
@@ -44,8 +47,22 @@ public class AmadeusFlightService {
         this.flightCollectionLogsRepository = flightCollectionLogsRepository;
     }
 
-    public void fetchData(String url) {
+    public void fetchAvailFlightData(String url) {
+
         try {
+
+            LocalDate today = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            String date = formatter.format(today);
+
+            Optional<HotelCollectionLogs> log = flightCollectionLogsRepository.findByCollectionDateAndSaveSuccess(date, true);
+
+            // 로그가 존재하고 saveSuccess가 true인 경우 메서드를 종료합니다.
+            if (log.isPresent()) {
+                System.out.println("금일 수집한 항공편 데이터 리스트가 이미 존재합니다.");
+                return;
+            }
+            
             String token = getAccessToken();
             if (token == null) throw new RuntimeException("Failed to get access token");
 
@@ -53,40 +70,21 @@ public class AmadeusFlightService {
             String originLocationCode = builder.build().getQueryParams().getFirst("originLocationCode");
             String destinationLocationCode = builder.build().getQueryParams().getFirst("destinationLocationCode");
 
-            JsonNode response = makeApiCall(url, token);
-            parseAndSaveData(response, originLocationCode, destinationLocationCode);
+            JsonNode response = amadeusApiKeyService.makeApiCall(url, token);
+            parseAndSaveFlightAvailData(response, originLocationCode, destinationLocationCode);
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
                 String newToken = amadeusApiKeyService.getAmadeusAccessToken();
                 if (newToken == null) throw new RuntimeException("Failed to refresh access token");
 
-                JsonNode response = makeApiCall(url, newToken);
+                JsonNode response = amadeusApiKeyService.makeApiCall(url, newToken);
                 UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
                 String originLocationCode = builder.build().getQueryParams().getFirst("originLocationCode");
                 String destinationLocationCode = builder.build().getQueryParams().getFirst("destinationLocationCode");
-                parseAndSaveData(response, originLocationCode, destinationLocationCode);
+                parseAndSaveFlightAvailData(response, originLocationCode, destinationLocationCode);
             } else {
                 throw e;
             }
-        }
-    }
-
-    private JsonNode makeApiCall(String url, String token) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(token);
-        headers.setOrigin("http://192.168.45.127");
-
-        System.out.println("url" + url);
-        System.out.println("token" + token);
-
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            return mapper.readTree(response.getBody());
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to parse response", e);
         }
     }
 
@@ -97,7 +95,7 @@ public class AmadeusFlightService {
     }
 
 
-    private void parseAndSaveData(JsonNode response,
+    private void parseAndSaveFlightAvailData(JsonNode response,
                                   String originLocationCode,
                                   String destinationLocationCode) {
         JsonNode data = response.path("data");
@@ -174,7 +172,11 @@ public class AmadeusFlightService {
             throw e;
         } finally {
             FlightCollectionLogs log = new FlightCollectionLogs();
-            log.setCollectionDate(new Date());
+
+            LocalDate today = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+            log.setCollectionDate(today.format(formatter));
             log.setSaveSuccess(success);
             flightCollectionLogsRepository.save(log);
         }
@@ -184,4 +186,6 @@ public class AmadeusFlightService {
     private String getAccessToken() {
         return amadeusApiKeyService.getAmadeusAccessToken();
     }
+
+
 }

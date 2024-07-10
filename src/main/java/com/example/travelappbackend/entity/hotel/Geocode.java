@@ -1,4 +1,4 @@
-package com.example.travelappbackend.entity;
+package com.example.travelappbackend.entity.hotel;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Getter
 @Setter
 @Document
-public class Aircraft {
-    private String code;
+public class Geocode {
+    private Float latitude;
+    private Float longitude;
 }

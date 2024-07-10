@@ -1,4 +1,4 @@
-package com.example.travelappbackend.entity;
+package com.example.travelappbackend.entity.user;
 
 import jakarta.persistence.*;
 import lombok.*;

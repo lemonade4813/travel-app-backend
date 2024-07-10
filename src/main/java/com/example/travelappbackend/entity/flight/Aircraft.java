@@ -1,6 +1,5 @@
-package com.example.travelappbackend.entity;
+package com.example.travelappbackend.entity.flight;
 
-import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -8,6 +7,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Getter
 @Setter
 @Document
-public class Hotels {
-    private Hotel[] hotels;
+public class Aircraft {
+    private String code;
 }

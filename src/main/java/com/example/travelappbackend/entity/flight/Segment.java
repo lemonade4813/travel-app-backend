@@ -1,4 +1,4 @@
-package com.example.travelappbackend.entity;
+package com.example.travelappbackend.entity.flight;
 
 import lombok.Getter;
 import lombok.Setter;

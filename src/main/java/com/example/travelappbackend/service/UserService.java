@@ -1,11 +1,9 @@
 package com.example.travelappbackend.service;
 
 import com.example.travelappbackend.model.UserDTO;
-import com.example.travelappbackend.repository.UserRepository;
+import com.example.travelappbackend.repository.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 
 @Service

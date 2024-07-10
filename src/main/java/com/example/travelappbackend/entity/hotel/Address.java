@@ -1,12 +1,13 @@
-package com.example.travelappbackend.entity;
+package com.example.travelappbackend.entity.hotel;
+
 
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+@Document
 @Getter
 @Setter
-@Document
-public class Operating {
-    private String carrierCode;
+public class Address {
+    private String countryCode;
 }

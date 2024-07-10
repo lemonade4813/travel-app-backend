@@ -1,7 +1,7 @@
 package com.example.travelappbackend.model;
 
 
-import com.example.travelappbackend.entity.User;
+import com.example.travelappbackend.entity.user.User;
 import lombok.Getter;
 import lombok.Setter;
 

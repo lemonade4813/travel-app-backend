@@ -1,7 +1,7 @@
 package com.example.travelappbackend.service;
 
-import com.example.travelappbackend.entity.FlightInfo;
-import com.example.travelappbackend.repository.FlightInfoRepository;
+import com.example.travelappbackend.entity.flight.FlightInfo;
+import com.example.travelappbackend.repository.flight.FlightInfoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

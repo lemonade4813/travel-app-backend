@@ -1,6 +1,6 @@
-package com.example.travelappbackend.repository;
+package com.example.travelappbackend.repository.user;
 
-import com.example.travelappbackend.entity.User;
+import com.example.travelappbackend.entity.user.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

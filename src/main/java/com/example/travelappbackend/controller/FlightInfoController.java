@@ -1,6 +1,6 @@
 package com.example.travelappbackend.controller;
 
-import com.example.travelappbackend.entity.FlightInfo;
+import com.example.travelappbackend.entity.flight.FlightInfo;
 import com.example.travelappbackend.service.FlightInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
