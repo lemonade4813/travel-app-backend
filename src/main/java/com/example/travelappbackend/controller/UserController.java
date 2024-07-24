@@ -33,4 +33,5 @@ public class UserController {
             return ResponseEntity.ok("사용가능한 아이디 입니다.");
         }
     }
+
 }

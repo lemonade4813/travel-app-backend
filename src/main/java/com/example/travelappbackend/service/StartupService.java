@@ -12,7 +12,7 @@ import java.util.List;
 
 @Service
 public class StartupService {
-
+    
     private final AmadeusFlightService amadeusFlightService;
     private final AmadeusHotelService amadeusHotelService;
     private final MongoTemplate mongoTemplate;
@@ -91,16 +91,19 @@ public class StartupService {
         LocalDate date = today.plusDays(2);
         String checkInDate = date.toString();
 
-        for(String hotelId : hotelIdList) {
-            String url = buildHotelDetailInfoUrl(hotelId, checkInDate);
-            try {
-                amadeusHotelService.fetchHotelDetailData(url);
-            } catch (Exception e) {
-                // Log the error and continue with the next hotelId
-                System.err.println("Error fetching hotel details for hotelId: " + hotelId);
-                e.printStackTrace();
-            }
-        }
+        System.out.println(hotelIdList);
+
+
+//        for(String hotelId : hotelIdList) {
+//            String url = buildHotelDetailInfoUrl(hotelId, checkInDate);
+//            try {
+//                amadeusHotelService.fetchHotelDetailData(url);
+//            } catch (Exception e) {
+//                // Log the error and continue with the next hotelId
+//                System.err.println("Error fetching hotel details for hotelId: " + hotelId);
+//                e.printStackTrace();
+//            }
+//        }
     }
 
 
@@ -120,7 +123,7 @@ public class StartupService {
 
     private String buildHotelDetailInfoUrl(String hotelId, String checkInDate) {
         return String.format(
-                "https://test.api.amadeus.com/v3/shopping/hotel-offers?hotelId=%s&checkInDate=%s",
+                "https://test.api.amadeus.com/v3/shopping/hotel-offers?hotelIds=%s&checkInDate=%s",
                 hotelId, checkInDate
         );
     }
