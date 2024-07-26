@@ -7,6 +7,7 @@ import com.example.travelappbackend.entity.hotel.HotelDetailInfo;
 import com.example.travelappbackend.service.HotelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class HotelController {
 
     @Autowired
@@ -24,6 +26,8 @@ public class HotelController {
     @GetMapping("/hotel")
     public ResponseEntity<List<Hotel>> getFlightList() {
         try {
+
+            System.out.println("1111");
             List<Hotel> hotelList= hotelService.getHotelList();
             return ResponseEntity.ok(hotelList);
         } catch (Exception e) {

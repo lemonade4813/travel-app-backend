@@ -33,8 +33,8 @@ public class StartupService {
         // 시작시 한 번 실행
 
         runScheduledFlightCollectTask();
-        runScheduledHotelListCollectTask();
-        runScheduledHotelDetailInfoCollectTask();
+//        runScheduledHotelListCollectTask();
+//        runScheduledHotelDetailInfoCollectTask();
 
     }
 
@@ -65,35 +65,35 @@ public class StartupService {
         }
     }
 
-    @Scheduled(cron = "0 0 13 * * ?") // 매일 오후 12시에 실행
-    public void runScheduledHotelListCollectTask() {
-        String[] cityCodes = {"NYC", "PAR", "TYO", "SEL", "PEK"};
-        for(String cityCode : cityCodes) {
-            String url = buildHotelListUrl(cityCode);
-            try {
-                amadeusHotelService.fetchAvailHotelData(url);
-            } catch (Exception e) {
-                // Log the error and continue with the next hotelId
-                System.err.println("Error fetching hotel details for hotelId");
-                e.printStackTrace();
-            }
+//    @Scheduled(cron = "0 0 13 * * ?") // 매일 오후 12시에 실행
+//    public void runScheduledHotelListCollectTask() {
+//        String[] cityCodes = {"NYC", "PAR", "TYO", "SEL", "PEK"};
+//        for(String cityCode : cityCodes) {
+//            String url = buildHotelListUrl(cityCode);
+//            try {
+//                amadeusHotelService.fetchAvailHotelData(url);
+//            } catch (Exception e) {
+//                // Log the error and continue with the next hotelId
+//                System.err.println("Error fetching hotel details for hotelId");
+//                e.printStackTrace();
+//            }
+//
+//        }
+//    }
 
-        }
-    }
-
-    @Scheduled(cron = "0 0 14 * * ?") // 매일 오후 12시에 실행
-    public void runScheduledHotelDetailInfoCollectTask() {
-        List<String> hotelIdList = mongoTemplate.getCollection("hotel").
-                distinct("hotelId", String.class).
-                into(new ArrayList<>());
-
-        LocalDate today = LocalDate.now();
-        LocalDate date = today.plusDays(2);
-        String checkInDate = date.toString();
-
-        System.out.println(hotelIdList);
-
-
+//    @Scheduled(cron = "0 0 14 * * ?") // 매일 오후 12시에 실행
+//    public void runScheduledHotelDetailInfoCollectTask() {
+//        List<String> hotelIdList = mongoTemplate.getCollection("hotel").
+//                distinct("hotelId", String.class).
+//                into(new ArrayList<>());
+//
+//        LocalDate today = LocalDate.now();
+//        LocalDate date = today.plusDays(2);
+//        String checkInDate = date.toString();
+//
+//        System.out.println(hotelIdList);
+//
+//
 //        for(String hotelId : hotelIdList) {
 //            String url = buildHotelDetailInfoUrl(hotelId, checkInDate);
 //            try {
@@ -104,7 +104,7 @@ public class StartupService {
 //                e.printStackTrace();
 //            }
 //        }
-    }
+//    }
 
 
     private String buildFlightOfferUrl(String origin, String destination, String departureDate, int adults, boolean nonStop, int max) {
