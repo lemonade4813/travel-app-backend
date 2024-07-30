@@ -14,7 +14,6 @@ import java.util.List;
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class FlightController {
-
     @Autowired
     FlightService flightService;
 
