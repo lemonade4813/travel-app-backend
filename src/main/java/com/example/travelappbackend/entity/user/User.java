@@ -16,13 +16,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class User {
 
     @Id
-    public Long id;
+    public String id;
 
     public String userId;
 
     private String password;
 
-    private Integer phone;
+    private String phone;
 
 }
 

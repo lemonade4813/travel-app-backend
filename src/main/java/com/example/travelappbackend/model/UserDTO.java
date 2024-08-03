@@ -14,7 +14,7 @@ public class UserDTO {
 
     private String password;
 
-    private Integer phone;
+    private String phone;
 
     public User toEntity() {
         return User.builder()

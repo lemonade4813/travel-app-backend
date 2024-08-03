@@ -19,6 +19,7 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<String> addUser(@RequestBody UserDTO userDTO) {
+
         try {
             userService.addUser(userDTO);
             return ResponseEntity.ok("성공적으로 회원가입이 완료되었습니다.");
