@@ -3,6 +3,7 @@ package com.example.travelappbackend.service;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -16,15 +17,18 @@ public class StartupService {
     private final AmadeusFlightService amadeusFlightService;
     private final AmadeusHotelService amadeusHotelService;
     private final MongoTemplate mongoTemplate;
+    private final DomesticAccomService domesticAccomService;
 
     @Autowired
     public StartupService(AmadeusFlightService amadeusFlightService,
                           AmadeusHotelService amadeusHotelService,
-                          MongoTemplate mongoTemplate
+                          MongoTemplate mongoTemplate,
+                          DomesticAccomService domesticAccomService
                           ) {
         this.amadeusFlightService = amadeusFlightService;
         this.amadeusHotelService = amadeusHotelService;
         this.mongoTemplate = mongoTemplate;
+        this.domesticAccomService = domesticAccomService;
     }
 
     @PostConstruct
@@ -35,6 +39,7 @@ public class StartupService {
         runScheduledFlightCollectTask();
 //        runScheduledHotelListCollectTask();
 //        runScheduledHotelDetailInfoCollectTask();
+        runScheduledDomesticAccomCollectTask();
 
     }
 
@@ -126,6 +131,10 @@ public class StartupService {
                 "https://test.api.amadeus.com/v3/shopping/hotel-offers?hotelIds=%s&checkInDate=%s",
                 hotelId, checkInDate
         );
+    }
+
+    public void runScheduledDomesticAccomCollectTask() {
+        domesticAccomService.fetchAndSaveDomesticAccomItems();
     }
 }
 
