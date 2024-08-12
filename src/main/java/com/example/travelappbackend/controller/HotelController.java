@@ -21,13 +21,9 @@ public class HotelController {
     @Autowired
     HotelService hotelService;
 
-
-
     @GetMapping("/hotel")
     public ResponseEntity<List<Hotel>> getFlightList() {
         try {
-
-            System.out.println("1111");
             List<Hotel> hotelList= hotelService.getHotelList();
             return ResponseEntity.ok(hotelList);
         } catch (Exception e) {

@@ -29,6 +29,8 @@ public class DomesticAccomService {
         return accomRepository.findAll();
     }
 
+    public Accom getDomesticAccomDetailInfo(String contentId){return  accomRepository.findByContentid(contentId);}
+
     public void fetchAndSaveDomesticAccomItems() {
         try {
             String url = "https://apis.data.go.kr/B551011/KorService1/searchStay1?serviceKey=GagNlrULGxksg16%2B71Pvi19nM5wOAy66KUlK5LF%2FfIXAe7fOeEPl3FyOBEJbnil91it6z5BSFNXDMxUMI9qEZg%3D%3D&numOfRows=100&pageNo=1&MobileOS=ETC&MobileApp=AppTest&_type=json&listYN=Y&arrange=A";

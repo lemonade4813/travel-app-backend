@@ -1,5 +1,6 @@
 package com.example.travelappbackend.service;
 
+import com.example.travelappbackend.entity.user.User;
 import com.example.travelappbackend.model.UserDTO;
 import com.example.travelappbackend.repository.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,13 +30,13 @@ public class UserService {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 가입된 아이디입니다.");
             }
 
-            userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-            userRepository.save(userDTO.toEntity());
-        }
 
-//    public boolean existsByMemberId(String userId){
-//
-//        return userRepository.existsByUserId(userId);
-//    }
+            userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+
+            User userEntity = userDTO.toEntity();
+            System.out.println(userEntity);
+            userRepository.save(userEntity);
+
+        }
 
 }

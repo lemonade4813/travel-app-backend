@@ -5,6 +5,7 @@ import com.example.travelappbackend.service.DomesticAccomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -21,10 +22,19 @@ public class DomesticAccomController {
             List<Accom> domesticAccomList = domesticAccomService.getDomesticAccom();
             return ResponseEntity.ok().body(domesticAccomList);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("500 에러가 발생했습니다.");
+            return ResponseEntity.status(500).body(e.getMessage());
         }
-
-
     }
 
+    @GetMapping("/domestic/accom/detail/{contentId}")
+    public ResponseEntity<?> getDomesitcAccomDetailInfo(@PathVariable String contentId){
+        try{
+            Accom domesticAccomDetailInfo = domesticAccomService.getDomesticAccomDetailInfo(contentId);
+            return ResponseEntity.ok().body(domesticAccomDetailInfo);
+        }
+        catch (Exception e){
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
+    }
 }

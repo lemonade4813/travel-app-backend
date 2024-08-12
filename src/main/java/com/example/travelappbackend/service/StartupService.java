@@ -134,7 +134,7 @@ public class StartupService {
     }
 
     public void runScheduledDomesticAccomCollectTask() {
-        domesticAccomService.fetchAndSaveDomesticAccomItems();
+//        domesticAccomService.fetchAndSaveDomesticAccomItems();
     }
 }
 

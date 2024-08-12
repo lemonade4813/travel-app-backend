@@ -20,7 +20,9 @@ public class FlightController {
     @GetMapping("/flight")
     public ResponseEntity<List<FlightInfo>> getFlightList() {
         try {
+            System.out.println("1111");
             List<FlightInfo> flightList = flightService.getFlightList();
+            System.out.println(flightList);
             return ResponseEntity.ok(flightList);
         } catch (Exception e) {
             return ResponseEntity.status(500).build();

@@ -4,4 +4,6 @@ import com.example.travelappbackend.entity.domestic.Accom;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface AccomRepository extends MongoRepository<Accom, String> {
+
+    Accom findByContentid(String contentId);
 }

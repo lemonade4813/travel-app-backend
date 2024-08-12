@@ -5,7 +5,6 @@ import com.example.travelappbackend.repository.user.UserRepository;
 import com.example.travelappbackend.entity.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -30,17 +29,17 @@ public class LoginService {
     @Autowired
     private JwtService jwtService;
 
-    public ResponseEntity<?> login(LoginDTO loginDTO) {
-        if (!userRepository.existsByUserId(loginDTO.getLoginId())) {
-            return ResponseEntity.status(400).body("회원가입이 필요합니다.");
+    public String login(LoginDTO loginDTO) {
+        if (!userRepository.existsByUserId(loginDTO.getUserId())) {
+            throw new RuntimeException("회원가입이 필요합니다.");
         }
 
-        User user = userRepository.findByUserId(loginDTO.getLoginId());
-//        if (!user.getPassword().equals(loginDTO.getPassword())) {
-//            return ResponseEntity.status(400).body("로그인 정보가 올바르지 않습니다");
-//        }
+        System.out.println(loginDTO.getUserId());
+
+        User user = userRepository.findByUserId(loginDTO.getUserId());
 
         if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
+            System.out.println("오류발생");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인 정보가 올바르지 않습니다.");
         }
 
@@ -48,7 +47,8 @@ public class LoginService {
         claims.put("userId", user.getUserId());
 
         String token = jwtService.create(claims, LocalDateTime.now().plusHours(2));
+        System.out.println(token);
 
-        return ResponseEntity.ok(token);
+        return token;
     }
 }

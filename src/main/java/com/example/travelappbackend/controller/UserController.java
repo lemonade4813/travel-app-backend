@@ -29,18 +29,4 @@ public class UserController {
             throw e;
         }
     }
-
-//    @GetMapping("/userIdCheck")
-//    public ResponseEntity<?> userIdCheck(@RequestParam String userId) throws BadRequestException {
-//
-//        System.out.println(userId);
-//
-//        if(userService.existsByMemberId(userId)){
-//            throw new BadRequestException("이미 사용중인 아이디입니다.");
-//        }
-//        else{
-//            return ResponseEntity.ok("사용가능한 아이디 입니다.");
-//        }
-//    }
-
 }

@@ -12,7 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class LoginDTO {
 
-    private String loginId;
+    private String userId;
 
     private String password;
 
