@@ -3,15 +3,14 @@ package com.example.travelappbackend.service;
 import com.example.travelappbackend.entity.logs.FlightCollectionLogs;
 import com.example.travelappbackend.entity.flight.FlightDetailInfo;
 import com.example.travelappbackend.entity.flight.FlightInfo;
-import com.example.travelappbackend.entity.flight.Segment;
 import com.example.travelappbackend.entity.logs.HotelCollectionLogs;
 import com.example.travelappbackend.repository.flight.FlightCollectionLogsRepository;
 import com.example.travelappbackend.repository.flight.FlightDetailInfoRepository;
 import com.example.travelappbackend.repository.flight.FlightInfoRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,8 +20,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -33,18 +30,23 @@ public class AmadeusFlightService {
     private final FlightInfoRepository flightInfoRepository;
     private final FlightDetailInfoRepository flightDetailInfoRepository;
     private final FlightCollectionLogsRepository flightCollectionLogsRepository;
+    private final MongoTemplate mongoTemplate;
 
     @Autowired
     public AmadeusFlightService(RestTemplate restTemplate,
                                 AmadeusApiKeyService amadeusApiKeyService,
                                 FlightInfoRepository flightInfoRepository,
                                 FlightDetailInfoRepository flightDetailInfoRepository,
-                                FlightCollectionLogsRepository flightCollectionLogsRepository) {
+                                FlightCollectionLogsRepository flightCollectionLogsRepository,
+                                MongoTemplate mongoTemplate
+                                ) {
         this.restTemplate = restTemplate;
         this.amadeusApiKeyService = amadeusApiKeyService;
         this.flightInfoRepository = flightInfoRepository;
         this.flightDetailInfoRepository = flightDetailInfoRepository;
         this.flightCollectionLogsRepository = flightCollectionLogsRepository;
+        this.mongoTemplate = mongoTemplate;
+
     }
 
     public void fetchAvailFlightData(String url) {
@@ -101,7 +103,6 @@ public class AmadeusFlightService {
         JsonNode data = response.path("data");
         boolean success = true;
 
-        System.out.println("datalist : " + data);
 
         try {
             if (data.isArray()) {
@@ -132,38 +133,10 @@ public class AmadeusFlightService {
 
                     // 항공편 예약 제공 상세 정보 테이블에 데이터 저장
 
-                    FlightDetailInfo flightDetailInfo = new FlightDetailInfo();
-
-                    ObjectMapper mapper = new ObjectMapper();
-                    JsonNode segmentsNode = flightData.path("itineraries").path("segments");
-
-
-                    List<Segment> segments = new ArrayList<>();
-
-                    if (segmentsNode.isArray()) {
-                        for (JsonNode segmentNode : segmentsNode) {
-                            try {
-                                Segment segment = mapper.treeToValue(segmentNode, Segment.class);
-                                segments.add(segment);
-                            } catch (JsonProcessingException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-
-                    flightDetailInfo.setType(type);
-                    flightDetailInfo.setOfferId(offerId);
-                    flightDetailInfo.setCurrency(currency);
-                    flightDetailInfo.setTotal(total);
-                    flightDetailInfo.setBase(base);
-                    flightDetailInfo.setOneWay(oneway);
-                    flightDetailInfo.setLastTicketingDate(lastTicketingDate);
-                    flightDetailInfo.setOriginLocationCode(originLocationCode);
-                    flightDetailInfo.setDestinationLocationCode(destinationLocationCode);
-                    flightDetailInfo.setSegments(segments);
-
-                    saveFlightInfoAndDetail(flightInfo, flightDetailInfo);
-
+                    Document doc = Document.parse(flightData.toString());
+                    doc.put("offerId", offerId);
+                    doc.remove("id");
+                    mongoTemplate.insert(doc, "flight_detail_info");
                 }
             }
 

@@ -1,12 +1,11 @@
 package com.example.travelappbackend.entity.flight;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Getter
-@Setter
-@Document
+@Data
 public class Segment {
     private Departure departure;
     private Arrival arrival;
