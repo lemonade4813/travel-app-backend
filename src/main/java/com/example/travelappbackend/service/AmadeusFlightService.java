@@ -131,6 +131,8 @@ public class AmadeusFlightService {
                     flightInfo.setDestinationLocationCode(destinationLocationCode);
                     flightInfo.setNumberOfBookableSeats(numberOfBookableSeats);
 
+
+                    flightInfoRepository.save(flightInfo);
                     // 항공편 예약 제공 상세 정보 테이블에 데이터 저장
 
                     Document doc = Document.parse(flightData.toString());

@@ -1,8 +1,10 @@
 package com.example.travelappbackend.controller;
 
+import com.example.travelappbackend.entity.flight.FlightDetailInfo;
 import com.example.travelappbackend.entity.flight.FlightInfo;
 import com.example.travelappbackend.service.CommonService;
 import com.example.travelappbackend.service.FlightInfoService;
+import com.example.travelappbackend.service.FlightService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,24 +20,27 @@ import java.util.Map;
 public class FlightInfoController {
 
     @Autowired
-    private FlightInfoService flightInfoService;
+    private FlightService flightService;
     @Autowired
     private CommonService commonService;
 
     @GetMapping("/flight/offer")
-    public ResponseEntity<?> flightOffers(@RequestParam String departAirport,
-                                          @RequestParam String arriveAirport,
-                                          @RequestParam String departureDate
+    public ResponseEntity<?> flightOffers(@RequestParam(required = false) String departAirport,
+                                          @RequestParam(required = false) String arriveAirport,
+                                          @RequestParam(required = false) String departureDate
                                           ) {
         try {
 
             Map<String, Object> queryParams = new HashMap<>();
-            queryParams.put("departAirport", departAirport);
-            queryParams.put("arriveAirport", arriveAirport);
-            queryParams.put("departureDate", departureDate);
+//            queryParams.put("departAirport", departAirport);
+//            queryParams.put("arriveAirport", arriveAirport);
+//            queryParams.put("departureDate", departureDate);
 
 
             List <FlightInfo> flightInfos = commonService.getDataByQueryParams(queryParams, FlightInfo.class);
+
+            System.out.println(flightInfos);
+
             return ResponseEntity.ok(flightInfos);
 
         } catch (Exception e) {
@@ -43,13 +48,19 @@ public class FlightInfoController {
         }
     }
 
-    @GetMapping("/flight/offer/{id}")
-    public ResponseEntity<?> flightOfferDetailInfo(@PathVariable String id){
+    @GetMapping("/flight/offer/detail/{offerId}")
+    public ResponseEntity<?> flightOfferDetailInfo(@PathVariable int offerId){
         try{
-            FlightInfo flightInfo = flightInfoService.getFlightItem(id);
-            return ResponseEntity.ok(flightInfo);
+
+            System.out.println(offerId);
+
+            FlightDetailInfo flightDetailInfo= flightService.getFlightDetailInfo(offerId);
+
+            System.out.println(flightDetailInfo);
+            return ResponseEntity.ok(flightDetailInfo);
         }
         catch (Exception e){
+            System.out.println(e.getMessage());
             return ResponseEntity.status(500).body("항공편 상세 정보 조회에 실패했습니다.");
         }
     }

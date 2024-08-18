@@ -24,8 +24,8 @@ public class FlightService {
         return flightInfoRepository.findAll();
     }
 
-    public Optional<FlightDetailInfo> getFlightDetailInfo(String id){
-        return flightDetailInfoRepository.findById(id);
+    public FlightDetailInfo getFlightDetailInfo(int offerId){
+        return flightDetailInfoRepository.findByOfferId(offerId);
     }
 
 
