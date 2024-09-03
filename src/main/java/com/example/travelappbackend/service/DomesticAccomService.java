@@ -16,7 +16,6 @@ import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -42,65 +41,6 @@ public class DomesticAccomService {
 
     public Accom getDomesticAccomDetailInfo(String contentId){return  accomRepository.findByContentid(contentId);}
 
-//    public void fetchAndSaveDomesticAccomItems() {
-//        try {
-//            String url = "https://apis.data.go.kr/B551011/KorService1/searchStay1?serviceKey=GagNlrULGxksg16%2B71Pvi19nM5wOAy66KUlK5LF%2FfIXAe7fOeEPl3FyOBEJbnil91it6z5BSFNXDMxUMI9qEZg%3D%3D&numOfRows=100&pageNo=1&MobileOS=ETC&MobileApp=AppTest&_type=json&listYN=Y&arrange=A";
-//
-//            URI uri = new URI(url);
-//
-//            ResponseEntity<String> response = restTemplate.getForEntity(uri, String.class);
-//
-//            ObjectMapper objectMapper = new ObjectMapper();
-//            JsonNode rootNode = objectMapper.readTree(response.getBody());
-//            JsonNode itemsNode = rootNode.path("response").path("body").path("items").path("item");
-//
-//            if (itemsNode.isArray()) {
-//                List<Accom> accomItems = Arrays.asList(objectMapper.convertValue(itemsNode, Accom[].class));
-//                accomRepository.saveAll(accomItems);
-//
-//
-//                List<AccomDetail> accomDetails = Arrays.asList(objectMapper.convertValue(itemsNode, AccomDetail[].class));
-//
-//                Random random = new Random();
-//
-//                int min = 100_000;
-//                int max = 300_000;
-//
-//
-//                for (AccomDetail accomDetail : accomDetails) {
-//                    int aTypePrice = (random.nextInt((max - min) / 1000 + 1) * 1000) + min;
-//                    int bTypePrice = (random.nextInt((max - min) / 1000 + 1) * 1000) + min;
-//
-//                    int aTypeAvailCount = random.nextInt(10) + 1;
-//                    int bTypeAvailCount = random.nextInt(10) + 1;
-//
-//                    // 생성된 랜덤 값을 accomDetail 객체에 설정
-//                    accomDetail.setATypePrice(aTypePrice);
-//                    accomDetail.setBTypePrice(bTypePrice);
-//                    accomDetail.setATypeAvailCount(aTypeAvailCount);
-//                    accomDetail.setBTypeAvailCount(bTypeAvailCount);
-//
-//                    LocalDate today = LocalDate.now();
-//
-//                    // 현재 날짜에서 7일 후의 날짜 계산
-//                    LocalDate sevenDaysLater = today.plusDays(7);
-//
-//                    // 날짜를 yyyy-MM-dd 형식으로 포맷팅
-//                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-//                    String formattedDate = sevenDaysLater.format(formatter);
-//
-//                    accomDetail.setCheckInDate(formattedDate);
-//                }
-//
-//                accomDetailRepository.saveAll(accomDetails);
-//            }
-//        } catch (URISyntaxException e) {
-//            e.printStackTrace();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-
     public void fetchAndSaveDomesticAccomItems() {
         try {
             String url = "https://apis.data.go.kr/B551011/KorService1/searchStay1?serviceKey=GagNlrULGxksg16%2B71Pvi19nM5wOAy66KUlK5LF%2FfIXAe7fOeEPl3FyOBEJbnil91it6z5BSFNXDMxUMI9qEZg%3D%3D&numOfRows=100&pageNo=1&MobileOS=ETC&MobileApp=AppTest&_type=json&listYN=Y&arrange=A";
@@ -114,47 +54,13 @@ public class DomesticAccomService {
                 List<Accom> accomItems = objectMapper.convertValue(itemsNode, objectMapper.getTypeFactory().constructCollectionType(List.class, Accom.class));
                 List<AccomDetail> accomDetails = objectMapper.convertValue(itemsNode, objectMapper.getTypeFactory().constructCollectionType(List.class, AccomDetail.class));
 
-                Random random = new Random();
-                int min = 100_000;
-                int max = 300_000;
 
-                // Save Accom items
                 for (Accom accom : accomItems) {
-                    Accom existingAccom = accomRepository.findByContentid(accom.getContentid());
-                    if (existingAccom != null) {
-                        accom.setId(existingAccom.getId()); // Set ID for update
-                    }
-                    accomRepository.save(accom);
+                    saveAccomIfNotExists(accom);
                 }
 
                 for (AccomDetail accomDetail : accomDetails) {
-                    List<AccomAvailInfo> availInfoList = new ArrayList<>();
-
-                    AccomAvailInfo aTypeInfo = new AccomAvailInfo();
-                    aTypeInfo.setATypePrice((random.nextInt((max - min) / 1000 + 1) * 1000) + min);
-                    aTypeInfo.setATypeAvailCount(random.nextInt(10) + 1);
-
-                    AccomAvailInfo bTypeInfo = new AccomAvailInfo();
-                    bTypeInfo.setBTypePrice((random.nextInt((max - min) / 1000 + 1) * 1000) + min);
-                    bTypeInfo.setBTypeAvailCount(random.nextInt(10) + 1);
-
-                    LocalDate today = LocalDate.now();
-                    LocalDate sevenDaysLater = today.plusDays(7);
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                    String formattedDate = sevenDaysLater.format(formatter);
-                    aTypeInfo.setCheckInDate(formattedDate);
-                    bTypeInfo.setCheckInDate(formattedDate);
-
-                    availInfoList.add(aTypeInfo);
-                    availInfoList.add(bTypeInfo);
-
-                    accomDetail.setAvailInfo(availInfoList);
-
-                    AccomDetail existingAccomDetail = accomDetailRepository.findByContentid(accomDetail.getContentid());
-                    if (existingAccomDetail != null) {
-                        accomDetail.setId(existingAccomDetail.getId()); // Set ID for update
-                    }
-                    accomDetailRepository.save(accomDetail);
+                    updateOrSaveAccomDetail(accomDetail);
                 }
             }
         } catch (URISyntaxException e) {
@@ -162,5 +68,68 @@ public class DomesticAccomService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void saveAccomIfNotExists(Accom accom) {
+        Accom existingAccom = accomRepository.findByContentid(accom.getContentid());
+        if (existingAccom == null) {
+            accomRepository.save(accom);
+        }
+    }
+
+    private void updateOrSaveAccomDetail(AccomDetail accomDetail) {
+        LocalDate today = LocalDate.now();
+        LocalDate sevenDaysLater = today.plusDays(7);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedDate = sevenDaysLater.format(formatter);
+
+        AccomDetail existingAccomDetail = accomDetailRepository.findByContentid(accomDetail.getContentid());
+
+        if (existingAccomDetail != null) {
+
+            List<AccomAvailInfo> existingAvailInfoList = existingAccomDetail.getAvailInfo();
+            boolean existsForDate = existingAvailInfoList.stream()
+                    .anyMatch(availInfo -> formattedDate.equals(availInfo.getCheckInDate()));
+
+            if (!existsForDate) {
+
+                List<AccomAvailInfo> newAvailInfoList = createAvailInfoList(formattedDate);
+                existingAvailInfoList.addAll(newAvailInfoList);
+                existingAccomDetail.setAvailInfo(existingAvailInfoList);
+
+
+                accomDetailRepository.save(existingAccomDetail);
+            }
+        } else {
+
+            List<AccomAvailInfo> availInfoList = createAvailInfoList(formattedDate);
+            accomDetail.setAvailInfo(availInfoList);
+            accomDetailRepository.save(accomDetail);
+        }
+    }
+
+    private List<AccomAvailInfo> createAvailInfoList(String formattedDate) {
+        Random random = new Random();
+        int min = 100_000;
+        int max = 300_000;
+
+        List<AccomAvailInfo> availInfoList = new ArrayList<>();
+
+
+        AccomAvailInfo aTypeInfo = new AccomAvailInfo();
+        aTypeInfo.setATypePrice((random.nextInt((max - min) / 1000 + 1) * 1000) + min);
+        aTypeInfo.setATypeAvailCount(random.nextInt(10) + 1);
+        aTypeInfo.setCheckInDate(formattedDate);
+
+
+        AccomAvailInfo bTypeInfo = new AccomAvailInfo();
+        bTypeInfo.setBTypePrice((random.nextInt((max - min) / 1000 + 1) * 1000) + min);
+        bTypeInfo.setBTypeAvailCount(random.nextInt(10) + 1);
+        bTypeInfo.setCheckInDate(formattedDate);
+
+        availInfoList.add(aTypeInfo);
+        availInfoList.add(bTypeInfo);
+
+        return availInfoList;
     }
 }
