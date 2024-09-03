@@ -5,6 +5,7 @@ import com.example.travelappbackend.entity.flight.FlightInfo;
 import com.example.travelappbackend.service.CommonService;
 import com.example.travelappbackend.service.FlightInfoService;
 import com.example.travelappbackend.service.FlightService;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,12 +53,19 @@ public class FlightInfoController {
     public ResponseEntity<?> flightOfferDetailInfo(@PathVariable int offerId){
         try{
 
-            System.out.println(offerId);
+            Document flightDetailInfo = flightService.getFlightDetailInfo(offerId);
 
-            FlightDetailInfo flightDetailInfo= flightService.getFlightDetailInfo(offerId);
 
             System.out.println(flightDetailInfo);
+
             return ResponseEntity.ok(flightDetailInfo);
+
+//            System.out.println(offerId);
+//
+//            FlightDetailInfo flightDetailInfo= flightService.getFlightDetailInfo(offerId);
+
+//            System.out.println(flightDetailInfo);
+//            return ResponseEntity.ok(flightDetailInfo);
         }
         catch (Exception e){
             System.out.println(e.getMessage());

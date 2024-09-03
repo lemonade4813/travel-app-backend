@@ -66,13 +66,16 @@ public class AmadeusApiKeyService {
         System.out.println("url" + url);
         System.out.println("token" + token);
 
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-
-        ObjectMapper mapper = new ObjectMapper();
         try {
+
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+            ObjectMapper mapper = new ObjectMapper();
+
             return mapper.readTree(response.getBody());
         } catch (Exception e) {
+            System.out.println(e);
             throw new RuntimeException("Failed to parse response", e);
         }
     }

@@ -1,14 +1,15 @@
 package com.example.travelappbackend.entity.domestic;
 
 import lombok.Data;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "domestic_accom")
-@Data
-public class Accom {
+import java.util.List;
 
-    @Id
+@Document(collection = "domestic_accom_detail_info")
+@Data
+
+public class AccomDetail {
+
     private String id;
     private String addr1;
     private String addr2;
@@ -34,6 +35,5 @@ public class Accom {
     private String booktour;
     private String sigungucode;
 
-
-
+    private List<AvailInfo> availInfo;
 }
