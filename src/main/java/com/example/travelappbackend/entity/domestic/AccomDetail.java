@@ -35,5 +35,5 @@ public class AccomDetail {
     private String booktour;
     private String sigungucode;
 
-    private List<AvailInfo> availInfo;
+    private List<AccomAvailInfo> availInfo;
 }
