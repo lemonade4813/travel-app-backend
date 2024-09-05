@@ -1,12 +1,13 @@
 package com.example.travelappbackend.controller;
 
-import com.example.travelappbackend.entity.flight.FlightDetailInfo;
 import com.example.travelappbackend.entity.flight.FlightInfo;
+import com.example.travelappbackend.model.ErrorDTO;
+import com.example.travelappbackend.model.ResponseDTO;
 import com.example.travelappbackend.service.CommonService;
-import com.example.travelappbackend.service.FlightInfoService;
 import com.example.travelappbackend.service.FlightService;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,15 +38,13 @@ public class FlightInfoController {
 //            queryParams.put("arriveAirport", arriveAirport);
 //            queryParams.put("departureDate", departureDate);
 
-
-            List <FlightInfo> flightInfos = commonService.getDataByQueryParams(queryParams, FlightInfo.class);
-
-            System.out.println(flightInfos);
-
-            return ResponseEntity.ok(flightInfos);
+            List<FlightInfo> flightInfos = commonService.getDataByQueryParams(queryParams, FlightInfo.class);
+            ResponseDTO<List<FlightInfo>> response = ResponseDTO.<List<FlightInfo>>builder().data(flightInfos).build();
+            return ResponseEntity.ok().body(response);
 
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("항공편 데이터 조회에 실패했습니다.");
+            ErrorDTO error = ErrorDTO.builder().error(e.getMessage()).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
@@ -54,11 +53,8 @@ public class FlightInfoController {
         try{
 
             Document flightDetailInfo = flightService.getFlightDetailInfo(offerId);
-
-
-            System.out.println(flightDetailInfo);
-
-            return ResponseEntity.ok(flightDetailInfo);
+            ResponseDTO<Document> response = ResponseDTO.<Document>builder().data(flightDetailInfo).build();
+            return ResponseEntity.ok().body(response);
 
 //            System.out.println(offerId);
 //
@@ -68,8 +64,8 @@ public class FlightInfoController {
 //            return ResponseEntity.ok(flightDetailInfo);
         }
         catch (Exception e){
-            System.out.println(e.getMessage());
-            return ResponseEntity.status(500).body("항공편 상세 정보 조회에 실패했습니다.");
+            ErrorDTO error = ErrorDTO.builder().error(e.getMessage()).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 }

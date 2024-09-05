@@ -3,8 +3,11 @@ package com.example.travelappbackend.service;
 import com.example.travelappbackend.entity.domestic.Accom;
 import com.example.travelappbackend.entity.domestic.AccomAvailInfo;
 import com.example.travelappbackend.entity.domestic.AccomDetail;
+import com.example.travelappbackend.entity.domestic.PurchaseAccomItem;
+import com.example.travelappbackend.model.PurchaseAccomItemDTO;
 import com.example.travelappbackend.repository.domestic.AccomDetailRepository;
 import com.example.travelappbackend.repository.domestic.AccomRepository;
+import com.example.travelappbackend.repository.domestic.PurchaseAccomItemRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +18,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 
 @Service
@@ -28,18 +29,23 @@ public class DomesticAccomService {
 
     private final AccomDetailRepository accomDetailRepository;
 
-    public DomesticAccomService(RestTemplate restTemplate, AccomRepository accomRepository, AccomDetailRepository accomDetailRepository){
+    private final PurchaseAccomItemRepository purchaseAccomItemRepository;
+
+    public DomesticAccomService(RestTemplate restTemplate, AccomRepository accomRepository, AccomDetailRepository accomDetailRepository, PurchaseAccomItemRepository purchaseAccomItemRepository) {
         this.restTemplate = restTemplate;
         this.accomRepository = accomRepository;
         this.accomDetailRepository = accomDetailRepository;
+        this.purchaseAccomItemRepository = purchaseAccomItemRepository;
 
     }
 
-    public List<Accom> getDomesticAccom(){
+    public List<Accom> getDomesticAccom() {
         return accomRepository.findAll();
     }
 
-    public Accom getDomesticAccomDetailInfo(String contentId){return  accomRepository.findByContentid(contentId);}
+    public AccomDetail getDomesticAccomDetailInfo(String contentId) {
+        return accomDetailRepository.findByContentid(contentId);
+    }
 
     public void fetchAndSaveDomesticAccomItems() {
         try {
@@ -59,6 +65,7 @@ public class DomesticAccomService {
                     saveAccomIfNotExists(accom);
                 }
 
+                // Save or update AccomDetail items
                 for (AccomDetail accomDetail : accomDetails) {
                     updateOrSaveAccomDetail(accomDetail);
                 }
@@ -117,19 +124,89 @@ public class DomesticAccomService {
 
 
         AccomAvailInfo aTypeInfo = new AccomAvailInfo();
-        aTypeInfo.setATypePrice((random.nextInt((max - min) / 1000 + 1) * 1000) + min);
-        aTypeInfo.setATypeAvailCount(random.nextInt(10) + 1);
+        aTypeInfo.setPrice((random.nextInt((max - min) / 1000 + 1) * 1000) + min);
+        aTypeInfo.setAvailCount(random.nextInt(10) + 1);
         aTypeInfo.setCheckInDate(formattedDate);
-
+        aTypeInfo.setType("Type A");
 
         AccomAvailInfo bTypeInfo = new AccomAvailInfo();
-        bTypeInfo.setBTypePrice((random.nextInt((max - min) / 1000 + 1) * 1000) + min);
-        bTypeInfo.setBTypeAvailCount(random.nextInt(10) + 1);
+        bTypeInfo.setPrice((random.nextInt((max - min) / 1000 + 1) * 1000) + min);
+        bTypeInfo.setAvailCount(random.nextInt(10) + 1);
         bTypeInfo.setCheckInDate(formattedDate);
+        bTypeInfo.setType("Type B");
 
         availInfoList.add(aTypeInfo);
         availInfoList.add(bTypeInfo);
 
         return availInfoList;
+    }
+
+
+    public boolean updateAvailCount(String contentid, String itemId) {
+        AccomDetail existingAccomDetail = accomDetailRepository.findByContentid(contentid);
+
+
+        if (existingAccomDetail != null && existingAccomDetail.getAvailInfo() != null) {
+            Optional<AccomAvailInfo> availInfoOpt = existingAccomDetail.getAvailInfo().stream()
+                    .filter(info -> info.getItemId().equals(itemId))
+                    .findFirst();
+
+            System.out.println(availInfoOpt);
+
+            if (availInfoOpt.isPresent()) {
+                AccomAvailInfo availInfo = availInfoOpt.get();
+
+                if (availInfo.getAvailCount() > 0) {
+                    availInfo.setAvailCount(availInfo.getAvailCount() - 1);
+                    accomDetailRepository.save(existingAccomDetail);
+                    return true;
+                } else {
+                    throw new IllegalStateException("예약 가능 수를 초과하였습니다.");
+                }
+            }
+        }
+        throw new IllegalArgumentException("예약 정보 조회에 실패하였습니다.");
+    }
+
+
+    public void createAccomPurchase(String contentid, String itemId, String userId, int price) {
+        PurchaseAccomItem accomPurchaseItem = new PurchaseAccomItem();
+
+        accomPurchaseItem.setContentid(contentid);
+        accomPurchaseItem.setItemId(itemId);
+        accomPurchaseItem.setUserId(userId);
+        accomPurchaseItem.setPrice(price);
+
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedDate = today.format(formatter);
+        accomPurchaseItem.setPurchaseDate(formattedDate);
+
+        purchaseAccomItemRepository.save(accomPurchaseItem);
+
+    }
+
+    public void conductAccomPurchase(PurchaseAccomItemDTO purchaseAccomItemDTO) {
+        String contentid = purchaseAccomItemDTO.getContentid();
+        String itemId = purchaseAccomItemDTO.getItemId();
+        int price = purchaseAccomItemDTO.getPrice();
+
+        try {
+
+            System.out.println("011110");
+            boolean updated = updateAvailCount(contentid, itemId);
+
+            System.out.println("1111");
+            if (updated) {
+                createAccomPurchase(contentid, itemId, "user01", price);
+            }
+            System.out.println("2222");
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid accommodation detail or item ID.");
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Insufficient availability for item purchase.");
+        } catch (Exception e) {
+            throw new RuntimeException("An unexpected error occurred during the purchase process.");
+        }
     }
 }

@@ -1,6 +1,8 @@
 package com.example.travelappbackend.controller;
 
 
+import com.example.travelappbackend.model.ErrorDTO;
+import com.example.travelappbackend.model.ResponseDTO;
 import com.example.travelappbackend.model.UserDTO;
 import com.example.travelappbackend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,16 +19,24 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<String> addUser(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<?> addUser(@RequestBody UserDTO userDTO) {
 
         try {
             userService.addUser(userDTO);
-            return ResponseEntity.ok("성공적으로 회원가입이 완료되었습니다.");
+            ResponseDTO response = ResponseDTO.builder().message("성공적으로 회원가입이 완료되었습니다.").build();
+            return ResponseEntity.ok().body(response);
         } catch (ResponseStatusException e) {
+
+            ErrorDTO error = null;
+
             if (e.getStatusCode() == HttpStatus.CONFLICT) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 가입된 아이디입니다.");
+                error = ErrorDTO.builder().error("이미 가입된 아이디입니다.").build();
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
             }
-            throw e;
+            else{
+                error = ErrorDTO.builder().error("오류가 발생하였습니다.").build();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+            }
         }
     }
 }

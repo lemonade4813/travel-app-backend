@@ -2,8 +2,11 @@ package com.example.travelappbackend.controller;
 
 
 import com.example.travelappbackend.entity.flight.FlightInfo;
+import com.example.travelappbackend.model.ErrorDTO;
+import com.example.travelappbackend.model.ResponseDTO;
 import com.example.travelappbackend.service.FlightService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,14 +21,14 @@ public class FlightController {
     FlightService flightService;
 
     @GetMapping("/flight")
-    public ResponseEntity<List<FlightInfo>> getFlightList() {
+    public ResponseEntity<?> getFlightList() {
         try {
-            System.out.println("1111");
             List<FlightInfo> flightList = flightService.getFlightList();
-            System.out.println(flightList);
-            return ResponseEntity.ok(flightList);
+            ResponseDTO<List<FlightInfo>> response = ResponseDTO.<List<FlightInfo>>builder().data(flightList).build();
+            return ResponseEntity.ok().body(response);
         } catch (Exception e) {
-            return ResponseEntity.status(500).build();
+            ErrorDTO error = ErrorDTO.builder().error(e.getMessage()).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 

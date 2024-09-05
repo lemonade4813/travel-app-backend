@@ -5,5 +5,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface AccomRepository extends MongoRepository<Accom, String> {
 
-    Accom findByContentid(String contentId);
+    Accom findByContentid(String contentid);
 }

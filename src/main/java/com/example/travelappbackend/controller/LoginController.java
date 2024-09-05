@@ -1,5 +1,6 @@
 package com.example.travelappbackend.controller;
 
+import com.example.travelappbackend.model.ErrorDTO;
 import com.example.travelappbackend.model.LoginDTO;
 import com.example.travelappbackend.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +32,10 @@ public class LoginController {
 
                 // 토큰을 담아서 프론트엔드로 리턴
                 return ResponseEntity.ok().body(accessToken);
-            } catch (RuntimeException ex) {
+            } catch (RuntimeException e) {
                 // 예외 발생 시 에러 메시지와 함께 401 Unauthorized 반환
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+                ErrorDTO error = ErrorDTO.builder().error(e.getMessage()).build();
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
             }
         }
 
