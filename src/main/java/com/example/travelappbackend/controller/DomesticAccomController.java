@@ -2,6 +2,7 @@ package com.example.travelappbackend.controller;
 
 import com.example.travelappbackend.entity.domestic.Accom;
 import com.example.travelappbackend.entity.domestic.AccomDetail;
+import com.example.travelappbackend.entity.domestic.PurchaseAccomItem;
 import com.example.travelappbackend.model.ErrorDTO;
 import com.example.travelappbackend.model.PurchaseAccomItemDTO;
 import com.example.travelappbackend.model.ResponseDTO;
@@ -61,4 +62,22 @@ public class DomesticAccomController {
         }
     }
 
+    @GetMapping("/domestic/accom/purchaseinfo")
+    public ResponseEntity<?> purchaseAccomInfo(@RequestParam String userId) {
+        try {
+            List <PurchaseAccomItem> purchaseAccomItems = domesticAccomService.getAccomPurchaseInfo(userId);
+            ResponseDTO response = ResponseDTO.<List<PurchaseAccomItem>>builder().data(purchaseAccomItems).build();
+
+            System.out.println(response);
+
+            return ResponseEntity.ok().body(response);
+        } catch (RuntimeException e) {
+            ErrorDTO error = ErrorDTO.builder().error(e.getMessage()).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        } catch (Exception e) {
+            ErrorDTO error = ErrorDTO.builder().error(e.getMessage()).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+
+    }
 }

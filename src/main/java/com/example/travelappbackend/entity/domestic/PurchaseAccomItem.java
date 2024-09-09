@@ -16,4 +16,6 @@ public class PurchaseAccomItem {
     private String itemId;
     private Integer price;
     private String purchaseDate;
+    private String type;
+    private String title;
 }

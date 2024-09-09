@@ -14,4 +14,6 @@ public class PurchaseAccomItemDTO {
     private String contentid;
     private String itemId;
     private Integer price;
+    private String title;
+    private String type;
 }

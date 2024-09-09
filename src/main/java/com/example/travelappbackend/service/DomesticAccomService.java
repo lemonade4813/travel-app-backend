@@ -169,13 +169,15 @@ public class DomesticAccomService {
     }
 
 
-    public void createAccomPurchase(String contentid, String itemId, String userId, int price) {
+    public void createAccomPurchase(String contentid, String itemId, String userId, int price, String type, String title) {
         PurchaseAccomItem accomPurchaseItem = new PurchaseAccomItem();
 
         accomPurchaseItem.setContentid(contentid);
         accomPurchaseItem.setItemId(itemId);
         accomPurchaseItem.setUserId(userId);
         accomPurchaseItem.setPrice(price);
+        accomPurchaseItem.setTitle(title);
+        accomPurchaseItem.setType(type);
 
         LocalDate today = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -190,17 +192,15 @@ public class DomesticAccomService {
         String contentid = purchaseAccomItemDTO.getContentid();
         String itemId = purchaseAccomItemDTO.getItemId();
         int price = purchaseAccomItemDTO.getPrice();
+        String type = purchaseAccomItemDTO.getType();
+        String title = purchaseAccomItemDTO.getTitle();
 
         try {
-
-            System.out.println("011110");
             boolean updated = updateAvailCount(contentid, itemId);
 
-            System.out.println("1111");
             if (updated) {
-                createAccomPurchase(contentid, itemId, "user01", price);
+                createAccomPurchase(contentid, itemId, "user01", price, type, title);
             }
-            System.out.println("2222");
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("Invalid accommodation detail or item ID.");
         } catch (IllegalStateException e) {
@@ -209,4 +209,12 @@ public class DomesticAccomService {
             throw new RuntimeException("An unexpected error occurred during the purchase process.");
         }
     }
+    public List<PurchaseAccomItem> getAccomPurchaseInfo (String userId){
+
+       return purchaseAccomItemRepository.findPurchaseAccomItemsBy(userId);
+
+    }
+
+
+
 }
