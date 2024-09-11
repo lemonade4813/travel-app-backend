@@ -142,7 +142,7 @@ public class DomesticAccomService {
     }
 
 
-    public boolean updateAvailCount(String contentid, String itemId) {
+    public boolean updateAvailCount(String contentid, String itemId, int number) {
         AccomDetail existingAccomDetail = accomDetailRepository.findByContentid(contentid);
 
 
@@ -157,7 +157,7 @@ public class DomesticAccomService {
                 AccomAvailInfo availInfo = availInfoOpt.get();
 
                 if (availInfo.getAvailCount() > 0) {
-                    availInfo.setAvailCount(availInfo.getAvailCount() - 1);
+                    availInfo.setAvailCount(availInfo.getAvailCount() + number);
                     accomDetailRepository.save(existingAccomDetail);
                     return true;
                 } else {
@@ -196,7 +196,7 @@ public class DomesticAccomService {
         String title = purchaseAccomItemDTO.getTitle();
 
         try {
-            boolean updated = updateAvailCount(contentid, itemId);
+            boolean updated = updateAvailCount(contentid, itemId, -1);
 
             if (updated) {
                 createAccomPurchase(contentid, itemId, "user01", price, type, title);
@@ -215,6 +215,17 @@ public class DomesticAccomService {
 
     }
 
+    public String deleteAccomPurchase (String contentid, String itemId, String purchaseId) {
+        try {
+            boolean exists = purchaseAccomItemRepository.existsByPurchaseId(purchaseId);
+                if(exists) {
+                    purchaseAccomItemRepository.deleteByPurchaseId(purchaseId);
+                    updateAvailCount(contentid, itemId, 1);
 
-
+                }
+            } catch (Exception e){
+                throw new RuntimeException("예약 삭제에 실패하였습니다.");
+        }
+        return "정상적으로 삭제가 완료되었습니다.";
+    }
 }

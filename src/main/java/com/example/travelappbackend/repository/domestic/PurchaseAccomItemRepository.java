@@ -9,4 +9,8 @@ public interface PurchaseAccomItemRepository extends MongoRepository<PurchaseAcc
 
     List<PurchaseAccomItem> findPurchaseAccomItemsBy(String userId);
 
+    void deleteByPurchaseId(String purchaseId);
+
+    boolean existsByPurchaseId(String purchaseId);
+
 }

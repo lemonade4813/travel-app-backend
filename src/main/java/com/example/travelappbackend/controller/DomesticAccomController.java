@@ -7,6 +7,7 @@ import com.example.travelappbackend.model.ErrorDTO;
 import com.example.travelappbackend.model.PurchaseAccomItemDTO;
 import com.example.travelappbackend.model.ResponseDTO;
 import com.example.travelappbackend.service.DomesticAccomService;
+import com.example.travelappbackend.service.StartupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -80,4 +81,27 @@ public class DomesticAccomController {
         }
 
     }
+
+
+    @DeleteMapping("/domestic/accom/purchase")
+    public ResponseEntity<?> deleteAccomPurchase(@RequestParam String contentid,
+                                                 @RequestParam String itemId,
+                                                 @RequestParam String purchaseId
+                                                 ){
+        System.out.println(contentid);
+        System.out.println(itemId);
+        System.out.println(purchaseId);
+
+        try{
+            String message = domesticAccomService.deleteAccomPurchase(contentid, itemId, purchaseId);
+            ResponseDTO response = ResponseDTO.builder().data(message).build();
+            return ResponseEntity.ok().body(response);
+        }
+        catch (Exception e){
+            ErrorDTO error = ErrorDTO.builder().error(e.getMessage()).build();
+            System.out.println(error);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
 }
