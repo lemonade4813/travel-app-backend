@@ -87,10 +87,11 @@ public class AmadeusHotelService {
             if (data.isArray()) {
                 for (JsonNode HotelListData : data) {
 
-                    String type = HotelListData.path("name").asText();
+                    String name = HotelListData.path("name").asText();
                     String hotelId = HotelListData.path("hotelId").asText();
                     String distance = HotelListData.path("distance").path("value").asText();
                     String unit = HotelListData.path("distance").path("init").asText();
+                    String cityCode = HotelListData.path("iataCode").asText();
 
                     Double latitude = HotelListData.path("geoCode").path("latitude").asDouble();
                     Double longitude = HotelListData.path("geoCode").path("longitude").asDouble();
@@ -103,13 +104,14 @@ public class AmadeusHotelService {
                     // 항공편 예약 제공 정보 테이블에 데이터 저장
 
                     Hotel hotel= new Hotel();
-                    hotel.setName(type);
+                    hotel.setName(name);
                     hotel.setHotelId(hotelId);
                     hotel.setDistance(distance);
                     hotel.setUnit(unit);
 
                     hotel.setLatitude(latitude);
                     hotel.setLongitude(longitude);
+                    hotel.setCityCode(cityCode);
 
 //                    hotel.setGeocode(geocode);
 
@@ -136,38 +138,30 @@ public class AmadeusHotelService {
     }
 
 
-    public void fetchHotelDetailData(String url) {
-
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String date = formatter.format(today);
-
-        try {
-            String token = getAccessToken();
-            if (token == null) throw new RuntimeException("Failed to get access token");
-
-            JsonNode response = amadeusApiKeyService.makeApiCall(url, token);
-            parseAndSaveHotelAvailData(response);
-        } catch (HttpClientErrorException e) {
-            if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-                String newToken = amadeusApiKeyService.getAmadeusAccessToken();
-                if (newToken == null) throw new RuntimeException("Failed to refresh access token");
-
-                JsonNode response = amadeusApiKeyService.makeApiCall(url, newToken);
-                parseAndSaveHotelAvailData(response);
-            } else {
-                throw e;
-            }
-        }
-    }
-
-
-
-
-
-
-
-
+//    public void fetchHotelDetailData(String url) {
+//
+//        LocalDate today = LocalDate.now();
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+//        String date = formatter.format(today);
+//
+//        try {
+//            String token = getAccessToken();
+//            if (token == null) throw new RuntimeException("Failed to get access token");
+//
+//            JsonNode response = amadeusApiKeyService.makeApiCall(url, token);
+//            parseAndSaveHotelAvailData(response);
+//        } catch (HttpClientErrorException e) {
+//            if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+//                String newToken = amadeusApiKeyService.getAmadeusAccessToken();
+//                if (newToken == null) throw new RuntimeException("Failed to refresh access token");
+//
+//                JsonNode response = amadeusApiKeyService.makeApiCall(url, newToken);
+//                parseAndSaveHotelAvailData(response);
+//            } else {
+//                throw e;
+//            }
+//        }
+//    }
 
 
     private String getAccessToken() {

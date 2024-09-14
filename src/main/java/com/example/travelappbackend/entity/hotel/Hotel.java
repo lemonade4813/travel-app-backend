@@ -18,6 +18,7 @@ public class Hotel {
     private String hotelId;
     private String distance;
     private String unit;
+    private String cityCode;
 
     private Double latitude;
     private Double longitude;
