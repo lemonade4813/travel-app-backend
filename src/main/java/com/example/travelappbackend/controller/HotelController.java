@@ -42,9 +42,9 @@ public class HotelController {
     public ResponseEntity<?> getHotelDetailInfo(@PathVariable String hotelId) {
 
         try {
-            List<Document> hotelDetailInfo = hotelService.getHotelDetailInfo(hotelId);
+            Document hotelDetailInfo = hotelService.getHotelDetailInfo(hotelId);
             System.out.println(hotelDetailInfo);
-            ResponseDTO<List<Document>> response = ResponseDTO.<List<Document>>builder().data(hotelDetailInfo).build();
+            ResponseDTO<Document> response = ResponseDTO.<Document>builder().data(hotelDetailInfo).build();
             System.out.println(response);
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {

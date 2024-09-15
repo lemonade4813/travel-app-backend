@@ -128,34 +128,41 @@ public class StartupService {
 
             // 4. 호텔 정보가 이미 존재하는지 확인
             Document existingHotel = mongoTemplate.getCollection("hotel_detail_info")
-                    .find(new Document("hotel.hotelId", hotelId))
+                    .find(new Document("hotelId", hotelId))
                     .first();
 
+            System.out.println(existingHotel);
+
+
+
             if (existingHotel != null) {
+
+                System.out.println("1");
                 // 5. 호텔 정보가 존재할 경우 offers 필드만 업데이트
                 mongoTemplate.getCollection("hotel_detail_info")
                         .updateOne(
-                                new Document("hotel.hotelId", hotelId),
+                                new Document("hotelId", hotelId),
                                 new Document("$set", new Document("offers", offers))
                         );
             } else {
+
+                System.out.println("2");
                 // 6. 호텔 정보가 존재하지 않을 경우 전체 문서 삽입
                 Document hotelDetail = new Document()
-                                .append("type", "hotel-offers")
-                                .append("hotel", new Document()
-                                        .append("type", "hotel")
-                                        .append("hotelId", hotelId)
-                                        .append("chainCode", chainCode)
-                                        .append("dupeId", generateRandomDupeId())  // dupeId 9자리 숫자 생성
-                                        .append("name", name)
-                                        .append("cityCode", cityCode))
-                                .append("available", true)
-                                .append("offers", offers);
+                        .append("type", "hotel-offers")
+                        .append("hotelId", hotelId)
+                        .append("chainCode", chainCode)
+                        .append("dupeId", generateRandomDupeId())  // dupeId 9자리 숫자 생성
+                        .append("name", name)
+                        .append("cityCode", cityCode)
+                        .append("available", true)
+                        .append("offers", offers);
 
                 mongoTemplate.getCollection("hotel_detail_info").insertOne(hotelDetail);
             }
         }
     }
+
 
     // offer 생성 메서드
     private Document createOffer(LocalDate checkInDate, LocalDate checkOutDate, String currency) {

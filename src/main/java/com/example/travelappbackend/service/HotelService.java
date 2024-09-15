@@ -29,10 +29,10 @@ public class HotelService {
         return hotelInfoRepository.findAll();
     }
 
-    public List<Document> getHotelDetailInfo(String hotelId) {
+    public Document getHotelDetailInfo(String hotelId) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("hotel.hotelId").is(hotelId));
+        query.addCriteria(Criteria.where("hotelId").is(hotelId));
         // Document로 결과를 반환
-        return mongoTemplate.find(query, Document.class, "hotel_detail_info");
+        return mongoTemplate.findOne(query, Document.class, "hotel_detail_info");
     }
 }
