@@ -126,21 +126,34 @@ public class StartupService {
                     createOffer(checkInDate, checkOutDate, currency)
             );
 
-            // 호텔 상세 정보 객체 생성
-            Document hotelDetail = new Document()
-                            .append("type", "hotel-offers")
-                            .append("hotel", new Document()
-                                    .append("type", "hotel")
-                                    .append("hotelId", hotelId)
-                                    .append("chainCode", chainCode)
-                                    .append("dupeId", generateRandomDupeId())  // dupeId 9자리 숫자 생성
-                                    .append("name", name)
-                                    .append("cityCode", cityCode))
-                            .append("available", true)
-                            .append("offers", offers);
+            // 4. 호텔 정보가 이미 존재하는지 확인
+            Document existingHotel = mongoTemplate.getCollection("hotel_detail_info")
+                    .find(new Document("hotel.hotelId", hotelId))
+                    .first();
 
-            // MongoDB에 호텔 상세 정보 저장 (컬렉션 이름: hotel_detail_info)
-            mongoTemplate.getCollection("hotel_detail_info").insertOne(hotelDetail);
+            if (existingHotel != null) {
+                // 5. 호텔 정보가 존재할 경우 offers 필드만 업데이트
+                mongoTemplate.getCollection("hotel_detail_info")
+                        .updateOne(
+                                new Document("hotel.hotelId", hotelId),
+                                new Document("$set", new Document("offers", offers))
+                        );
+            } else {
+                // 6. 호텔 정보가 존재하지 않을 경우 전체 문서 삽입
+                Document hotelDetail = new Document()
+                                .append("type", "hotel-offers")
+                                .append("hotel", new Document()
+                                        .append("type", "hotel")
+                                        .append("hotelId", hotelId)
+                                        .append("chainCode", chainCode)
+                                        .append("dupeId", generateRandomDupeId())  // dupeId 9자리 숫자 생성
+                                        .append("name", name)
+                                        .append("cityCode", cityCode))
+                                .append("available", true)
+                                .append("offers", offers);
+
+                mongoTemplate.getCollection("hotel_detail_info").insertOne(hotelDetail);
+            }
         }
     }
 

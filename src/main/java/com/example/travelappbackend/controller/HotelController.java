@@ -7,6 +7,7 @@ import com.example.travelappbackend.entity.hotel.HotelDetailInfo;
 import com.example.travelappbackend.model.ErrorDTO;
 import com.example.travelappbackend.model.ResponseDTO;
 import com.example.travelappbackend.service.HotelService;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +26,9 @@ public class HotelController {
     HotelService hotelService;
 
     @GetMapping("/hotel")
-    public ResponseEntity<?> getFlightList() {
+    public ResponseEntity<?> getHotelList() {
         try {
+
             List<Hotel> hotelList= hotelService.getHotelList();
             ResponseDTO<List<Hotel>> response = ResponseDTO.<List<Hotel>>builder().data(hotelList).build();
             return ResponseEntity.ok().body(response);
@@ -37,18 +39,19 @@ public class HotelController {
     }
 
     @GetMapping("/hotel/{hotelId}")
-    public ResponseEntity<?> getFlightList(@PathVariable String hotelId) {
+    public ResponseEntity<?> getHotelDetailInfo(@PathVariable String hotelId) {
+
         try {
-            HotelDetailInfo hotelDetailInfo = hotelService.getHotelDetailInfo(hotelId);
-            ResponseDTO<HotelDetailInfo> response = ResponseDTO.<HotelDetailInfo>builder().data(hotelDetailInfo).build();
+            List<Document> hotelDetailInfo = hotelService.getHotelDetailInfo(hotelId);
+            System.out.println(hotelDetailInfo);
+            ResponseDTO<List<Document>> response = ResponseDTO.<List<Document>>builder().data(hotelDetailInfo).build();
+            System.out.println(response);
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {
             ErrorDTO error = ErrorDTO.builder().error(e.getMessage()).build();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
-
-
 
 
 }

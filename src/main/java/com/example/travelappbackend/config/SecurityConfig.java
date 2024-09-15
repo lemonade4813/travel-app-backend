@@ -37,7 +37,7 @@ public class SecurityConfig {
 //                .requestMatchers("/hotel", "/flight", "/domestic/**").authenticated()
                 .requestMatchers( "/signup",
                                   "/login",
-                                  "/hotel",
+                                  "/hotel/**",
                                   "/flight/**",
                                   "/domestic/**").permitAll()
 
