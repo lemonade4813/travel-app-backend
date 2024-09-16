@@ -5,16 +5,14 @@ import com.example.travelappbackend.entity.flight.FlightInfo;
 import com.example.travelappbackend.entity.hotel.Hotel;
 import com.example.travelappbackend.entity.hotel.HotelDetailInfo;
 import com.example.travelappbackend.model.ErrorDTO;
+import com.example.travelappbackend.model.PurchaseHotelItemDTO;
 import com.example.travelappbackend.model.ResponseDTO;
 import com.example.travelappbackend.service.HotelService;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -49,6 +47,21 @@ public class HotelController {
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {
             ErrorDTO error = ErrorDTO.builder().error(e.getMessage()).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
+    @PostMapping("/hotel/purchase")
+    public ResponseEntity<?> createPurchase(@RequestBody PurchaseHotelItemDTO purchaseHotelItemDTO) {
+        try {
+            System.out.println("1222222222222222");
+            System.out.println(purchaseHotelItemDTO.getHotelId() + "  "  + purchaseHotelItemDTO.getOfferId());
+            hotelService.createPurchase(purchaseHotelItemDTO.getHotelId(), purchaseHotelItemDTO.getOfferId());
+            ResponseDTO<String> response = ResponseDTO.<String>builder().data("결제가 성공적으로 처리되었습니다.").build();
+            return ResponseEntity.ok().body(response);
+        } catch (Exception e) {
+            ErrorDTO error = ErrorDTO.builder().error("결제 처리 중 오류가 발생했습니다: " + e.getMessage()).build();
+
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
