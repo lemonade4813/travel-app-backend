@@ -9,4 +9,6 @@ public interface HotelDetailInfoRepository extends MongoRepository<HotelDetailIn
 
     HotelDetailInfo findHotelDetailInfoByHotelId(String hotelId);
 
+    boolean existsHotelDetailInfoByHotelId(String hotelId);
+
 }
