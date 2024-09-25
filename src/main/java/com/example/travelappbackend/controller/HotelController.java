@@ -13,6 +13,9 @@ import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,7 +30,6 @@ public class HotelController {
     @GetMapping("/hotel")
     public ResponseEntity<?> getHotelList() {
         try {
-
             List<Hotel> hotelList= hotelService.getHotelList();
             ResponseDTO<List<Hotel>> response = ResponseDTO.<List<Hotel>>builder().data(hotelList).build();
             return ResponseEntity.ok().body(response);
@@ -53,9 +55,9 @@ public class HotelController {
     }
 
     @PostMapping("/hotel/purchase")
-    public ResponseEntity<?> createPurchase(@RequestBody PurchaseHotelItemDTO purchaseHotelItemDTO) {
+    public ResponseEntity<?> createPurchase(@RequestBody PurchaseHotelItemDTO purchaseHotelItemDTO, @AuthenticationPrincipal String userId) {
         try {
-            hotelService.createPurchase(purchaseHotelItemDTO.getHotelId(), purchaseHotelItemDTO.getOfferId());
+            hotelService.createPurchase(purchaseHotelItemDTO.getHotelId(), purchaseHotelItemDTO.getOfferId(), userId);
             ResponseDTO<String> response = ResponseDTO.<String>builder().data("예약이 성공적으로 처리되었습니다.").build();
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {
@@ -68,6 +70,7 @@ public class HotelController {
     @GetMapping("/hotel/purchaselist")
     public ResponseEntity<?> getPurchaseList(){
         try{
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!");
             List<PurchaseHotelItem> purchaseList = hotelService.getPurchaseList();
             ResponseDTO<List<PurchaseHotelItem>> response = ResponseDTO.<List<PurchaseHotelItem>>builder().data(purchaseList).build();
             return ResponseEntity.ok().body(response);

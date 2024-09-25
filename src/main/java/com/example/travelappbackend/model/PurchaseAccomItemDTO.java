@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
 
 @Getter
 @Setter
@@ -11,6 +12,8 @@ import lombok.Setter;
 @AllArgsConstructor
 
 public class PurchaseAccomItemDTO {
+
+    private String userId;
     private String contentid;
     private String itemId;
     private Integer price;

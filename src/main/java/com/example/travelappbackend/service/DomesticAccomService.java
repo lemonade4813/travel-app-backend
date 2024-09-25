@@ -194,12 +194,15 @@ public class DomesticAccomService {
         int price = purchaseAccomItemDTO.getPrice();
         String type = purchaseAccomItemDTO.getType();
         String title = purchaseAccomItemDTO.getTitle();
+        String userId = purchaseAccomItemDTO.getUserId();
 
         try {
+
+            System.out.println("userId !!!!!!" + userId);
             boolean updated = updateAvailCount(contentid, itemId, -1);
 
             if (updated) {
-                createAccomPurchase(contentid, itemId, "user01", price, type, title);
+                createAccomPurchase(contentid, itemId, userId, price, type, title);
             }
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("Invalid accommodation detail or item ID.");

@@ -11,6 +11,8 @@ import com.example.travelappbackend.service.StartupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +32,7 @@ public class DomesticAccomController {
 //            ErrorDTO error = ErrorDTO.builder().error("에러가 발생하였습니다.").build();
 //            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         } catch (Exception e) {
+            e.getStackTrace();
             ErrorDTO error = ErrorDTO.builder().error(e.getMessage()).build();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
@@ -49,33 +52,37 @@ public class DomesticAccomController {
     }
 
     @PostMapping("/domestic/accom/purchase")
-    public ResponseEntity<?> purchaseAccomItem(@RequestBody PurchaseAccomItemDTO purchaseAccomItemDTO) {
+    public ResponseEntity<?> purchaseAccomItem(@RequestBody PurchaseAccomItemDTO purchaseAccomItemDTO, @AuthenticationPrincipal String userId) {
         try {
+            purchaseAccomItemDTO.setUserId(userId);
             domesticAccomService.conductAccomPurchase(purchaseAccomItemDTO);
             ResponseDTO message = ResponseDTO.builder().message("정상적으로 예약이 완료되었습니다.").build();
             return ResponseEntity.ok().body(message);
         } catch (RuntimeException e) {
+
+            e.getStackTrace();
             ErrorDTO error = ErrorDTO.builder().error(e.getMessage()).build();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         } catch (Exception e) {
+
+            e.getStackTrace();
             ErrorDTO error = ErrorDTO.builder().error(e.getMessage()).build();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
     @GetMapping("/domestic/accom/purchaseinfo")
-    public ResponseEntity<?> purchaseAccomInfo(@RequestParam String userId) {
+    public ResponseEntity<?> purchaseAccomInfo(@AuthenticationPrincipal String userId) {
         try {
             List <PurchaseAccomItem> purchaseAccomItems = domesticAccomService.getAccomPurchaseInfo(userId);
             ResponseDTO response = ResponseDTO.<List<PurchaseAccomItem>>builder().data(purchaseAccomItems).build();
-
-            System.out.println(response);
-
             return ResponseEntity.ok().body(response);
         } catch (RuntimeException e) {
+            e.getStackTrace();
             ErrorDTO error = ErrorDTO.builder().error(e.getMessage()).build();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         } catch (Exception e) {
+            e.getStackTrace();
             ErrorDTO error = ErrorDTO.builder().error(e.getMessage()).build();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }

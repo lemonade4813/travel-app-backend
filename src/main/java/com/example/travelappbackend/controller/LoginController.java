@@ -33,7 +33,7 @@ public class LoginController {
                 // 토큰을 담아서 프론트엔드로 리턴
                 return ResponseEntity.ok().body(accessToken);
             } catch (RuntimeException e) {
-                // 예외 발생 시 에러 메시지와 함께 401 Unauthorized 반환
+
                 ErrorDTO error = ErrorDTO.builder().error(e.getMessage()).build();
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
             }

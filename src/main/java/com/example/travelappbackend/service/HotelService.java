@@ -49,7 +49,7 @@ public class HotelService {
         return mongoTemplate.findOne(query, Document.class, "hotel_detail_info");
     }
 
-    public void createPurchase(String hotelId, String offerId) {
+    public void createPurchase(String hotelId, String offerId, String userId) {
 
         Query hotelQuery = new Query(Criteria.where("hotelId").is(hotelId));
 
@@ -85,6 +85,7 @@ public class HotelService {
                     Document purchase = new Document()
                             .append("hotelId", hotelId)
                             .append("offerId", offerId)
+                            .append("userId", userId)
                             .append("purchaseDate", new java.util.Date());
 
                     mongoTemplate.insert(purchase, "purchase_hotel_info");

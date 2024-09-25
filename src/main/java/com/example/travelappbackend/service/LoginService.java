@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class LoginService {
@@ -34,19 +35,20 @@ public class LoginService {
             throw new RuntimeException("회원가입이 필요합니다.");
         }
 
-        System.out.println(loginDTO.getUserId());
+        Optional<User> user = userRepository.findByUserId(loginDTO.getUserId());
 
-        User user = userRepository.findByUserId(loginDTO.getUserId());
+        String userId = user.get().getUserId();
+        String password = user.get().getPassword();
 
-        if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
-            System.out.println("오류발생");
+
+        if (!passwordEncoder.matches(loginDTO.getPassword(), password)) {
+            System.out.println("로그인 오류 발생");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인 정보가 올바르지 않습니다.");
         }
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", user.getUserId());
 
-        String token = jwtService.create(claims, LocalDateTime.now().plusHours(2));
+        String token = jwtService.create(claims, LocalDateTime.now().plusHours(2), userId);
         System.out.println(token);
 
         return token;

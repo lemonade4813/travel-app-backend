@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PurchaseHotelItemDTO {
 
+    private String userId;
     private String hotelId;
     private String offerId;
 }
