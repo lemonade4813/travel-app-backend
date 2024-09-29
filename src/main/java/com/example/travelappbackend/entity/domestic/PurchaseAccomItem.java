@@ -18,4 +18,5 @@ public class PurchaseAccomItem {
     private String purchaseDate;
     private String type;
     private String title;
+    private String checkInDate;
 }

@@ -19,4 +19,5 @@ public class PurchaseAccomItemDTO {
     private Integer price;
     private String title;
     private String type;
+    private String checkInDate;
 }

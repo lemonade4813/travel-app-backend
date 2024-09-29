@@ -169,7 +169,7 @@ public class DomesticAccomService {
     }
 
 
-    public void createAccomPurchase(String contentid, String itemId, String userId, int price, String type, String title) {
+    public void createAccomPurchase(String contentid, String itemId, String userId, int price, String type, String title, String checkInDate) {
         PurchaseAccomItem accomPurchaseItem = new PurchaseAccomItem();
 
         accomPurchaseItem.setContentid(contentid);
@@ -178,6 +178,9 @@ public class DomesticAccomService {
         accomPurchaseItem.setPrice(price);
         accomPurchaseItem.setTitle(title);
         accomPurchaseItem.setType(type);
+        accomPurchaseItem.setCheckInDate(checkInDate);
+
+        System.out.println(accomPurchaseItem);
 
         LocalDate today = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -195,6 +198,7 @@ public class DomesticAccomService {
         String type = purchaseAccomItemDTO.getType();
         String title = purchaseAccomItemDTO.getTitle();
         String userId = purchaseAccomItemDTO.getUserId();
+        String checkInDate = purchaseAccomItemDTO.getCheckInDate();
 
         try {
 
@@ -202,7 +206,7 @@ public class DomesticAccomService {
             boolean updated = updateAvailCount(contentid, itemId, -1);
 
             if (updated) {
-                createAccomPurchase(contentid, itemId, userId, price, type, title);
+                createAccomPurchase(contentid, itemId, userId, price, type, title, checkInDate);
             }
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("Invalid accommodation detail or item ID.");
