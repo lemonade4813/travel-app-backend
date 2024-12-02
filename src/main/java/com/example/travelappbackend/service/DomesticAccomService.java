@@ -202,7 +202,6 @@ public class DomesticAccomService {
 
         try {
 
-            System.out.println("userId !!!!!!" + userId);
             boolean updated = updateAvailCount(contentid, itemId, -1);
 
             if (updated) {

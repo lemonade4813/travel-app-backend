@@ -51,8 +51,8 @@ public class DomesticAccomController {
         }
     }
 
-    @PostMapping("/domestic/accom/purchase")
-    public ResponseEntity<?> purchaseAccomItem(@RequestBody PurchaseAccomItemDTO purchaseAccomItemDTO, @AuthenticationPrincipal String userId) {
+    @PostMapping("/domestic/accom/reservations")
+    public ResponseEntity<?> reserveAccomItem(@RequestBody PurchaseAccomItemDTO purchaseAccomItemDTO, @AuthenticationPrincipal String userId) {
         try {
             purchaseAccomItemDTO.setUserId(userId);
             domesticAccomService.conductAccomPurchase(purchaseAccomItemDTO);
@@ -71,7 +71,7 @@ public class DomesticAccomController {
         }
     }
 
-    @GetMapping("/domestic/accom/purchaseinfo")
+    @GetMapping("/domestic/accom/reservations")
     public ResponseEntity<?> purchaseAccomInfo(@AuthenticationPrincipal String userId) {
         try {
             List <PurchaseAccomItem> purchaseAccomItems = domesticAccomService.getAccomPurchaseInfo(userId);
@@ -90,7 +90,7 @@ public class DomesticAccomController {
     }
 
 
-    @DeleteMapping("/domestic/accom/purchase")
+    @DeleteMapping("/domestic/accom/reservations")
     public ResponseEntity<?> deleteAccomPurchase(@RequestParam String contentid,
                                                  @RequestParam String itemId,
                                                  @RequestParam String purchaseId

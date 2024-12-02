@@ -54,8 +54,8 @@ public class HotelController {
         }
     }
 
-    @PostMapping("/hotel/purchase")
-    public ResponseEntity<?> createPurchase(@RequestBody PurchaseHotelItemDTO purchaseHotelItemDTO, @AuthenticationPrincipal String userId) {
+    @PostMapping("/hotel/reservation")
+    public ResponseEntity<?> createReservation(@RequestBody PurchaseHotelItemDTO purchaseHotelItemDTO, @AuthenticationPrincipal String userId) {
         try {
             hotelService.createPurchase(purchaseHotelItemDTO.getHotelId(), purchaseHotelItemDTO.getOfferId(), userId);
             ResponseDTO<String> response = ResponseDTO.<String>builder().data("예약이 성공적으로 처리되었습니다.").build();
@@ -67,10 +67,9 @@ public class HotelController {
         }
     }
 
-    @GetMapping("/hotel/purchaselist")
-    public ResponseEntity<?> getPurchaseList(){
+    @GetMapping("/hotel/reservation")
+    public ResponseEntity<?> getReservationList(){
         try{
-            System.out.println("!!!!!!!!!!!!!!!!!!!!!!");
             List<PurchaseHotelItem> purchaseList = hotelService.getPurchaseList();
             ResponseDTO<List<PurchaseHotelItem>> response = ResponseDTO.<List<PurchaseHotelItem>>builder().data(purchaseList).build();
             return ResponseEntity.ok().body(response);
@@ -82,7 +81,7 @@ public class HotelController {
         }
     }
 
-    @DeleteMapping("/hotel/purchase")
+    @DeleteMapping("/hotel/reservation")
     public ResponseEntity<?> deleteHotelPurchase(
                                                     @RequestParam String purchaseId,
                                                     @RequestParam String hotelId,
